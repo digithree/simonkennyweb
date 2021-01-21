@@ -1,0 +1,9 @@
+input[type="text"] {
+    position: relative;
+    width: 80%;
+}
+
+.ahoveroff a:hover{
+    background-color: var(--background-color);
+    color: var(--primary-color);
+}
