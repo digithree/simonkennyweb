@@ -7,3 +7,7 @@ input[type="text"] {
     background-color: var(--background-color);
     color: var(--primary-color);
 }
+
+img {
+    border: solid var(--font-color) 2px;
+}

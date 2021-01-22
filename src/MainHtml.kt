@@ -1,5 +1,6 @@
 package co.simonkenny.web
 
+import co.simonkenny.web.command.SuggestedCommand
 import kotlinx.html.*
 
 fun commonHead(html: HTML, dark: Boolean = false) =

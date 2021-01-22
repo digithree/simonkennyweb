@@ -1,4 +1,4 @@
-package co.simonkenny.web
+package co.simonkenny.web.command
 
 const val CMD_CONFIG = "config"
 

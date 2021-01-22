@@ -1,10 +1,18 @@
-package co.simonkenny.web
+package co.simonkenny.web.command
 
 import io.ktor.http.*
 import kotlinx.html.HtmlBlockTag
 import kotlinx.html.code
+import kotlinx.html.div
 import kotlinx.html.p
+import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
+import org.intellij.markdown.html.HtmlGenerator
+import org.intellij.markdown.parser.MarkdownParser
 
+
+data class SuggestedCommand(val uri: String, val text: String)
+
+data class CommandMetadata(val name: String, val params: List<String>)
 
 abstract class Command(
     // Flags added to this command to modify its behaviour.
@@ -26,11 +34,13 @@ abstract class Command(
     /**
      * Render this command to a HTML block directly.
      */
-    open fun render(block: HtmlBlockTag) =
+    open suspend fun render(block: HtmlBlockTag) =
         with(block) {
-            p {
-                code { +name }
-                +" run with params: ${flags.flagsDisplay()}"
+            div("container") {
+                p {
+                    code { +name }
+                    +" run with params: ${flags.flagsDisplay()}"
+                }
             }
         }
 
@@ -128,3 +138,9 @@ fun List<FlagData>.flagsDisplay(leadingSpaceIfNotEmpty: Boolean = true) =
             joinToString(" ", transform = { flagData -> flagData.toReadableString() })
     }
     else ""
+
+fun String.fromMarkdown(): String {
+    val flavour = CommonMarkFlavourDescriptor()
+    val parsedTree = MarkdownParser(flavour).buildMarkdownTreeFromString(this)
+    return HtmlGenerator(this, parsedTree, flavour).generateHtml()
+}
