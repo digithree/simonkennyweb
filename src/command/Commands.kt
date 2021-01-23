@@ -84,26 +84,31 @@ fun parseCommands(parameters: Parameters): List<Command> =
         .filter { it.key == "cmd" }
         .map { it.value }
         .flatten()
-        .map {
-            it.split(" ")
-                .let { parts ->
-                    CommandMetadata(
-                        parts[0],
-                        parts
-                            .takeIf { list -> list.size > 1 }
-                            ?.subList(1, parts.size)
-                            ?: emptyList()
-                    )
-                }
-        }.mapNotNull {
+        .toList()
+        .let { parseCommands(it) }
+
+fun parseCommands(commands: List<String>): List<Command> =
+    commands.mapNotNull { parseCommand(it) }
+        .distinctBy { it.distinctKey() }
+
+fun parseCommand(command: String): Command? =
+    command.split(" ")
+        .let { parts ->
+            CommandMetadata(
+                parts[0],
+                parts
+                    .takeIf { list -> list.size > 1 }
+                    ?.subList(1, parts.size)
+                    ?: emptyList()
+            )
+        }.let {
             when (it.name) {
-                CMD_CONFIG -> ConfigCmd.parse(it.params)
-                CMD_ABOUT -> AboutCmd.parse(it.params)
+                CMD_CONFIG -> ConfigCommand.parse(it.params)
+                CMD_ABOUT -> AboutCommand.parse(it.params)
                 else -> null
             }
         }
-        .distinctBy { it.distinctKey() }
-        .toList()
+
 
 
 fun List<String>.extractFlagsRaw() =

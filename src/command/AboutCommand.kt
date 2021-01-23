@@ -11,19 +11,19 @@ private val FLAG_TYPE = FlagInfo("t", "type", default = true, optional = false)
 private const val DEFAULT_TYPE_VALUE = "projects"
 
 
-class AboutCmd private constructor(
+class AboutCommand private constructor(
     flags: List<FlagData>
 ): Command(flags) {
 
     override val name = CMD_ABOUT
 
     companion object {
-        fun default() = AboutCmd(listOf(FlagData(FLAG_TYPE, listOf(DEFAULT_TYPE_VALUE))))
+        fun default() = AboutCommand(listOf(FlagData(FLAG_TYPE, listOf(DEFAULT_TYPE_VALUE))))
 
         private val registeredFlags = listOf(FLAG_TYPE)
 
-        fun parse(params: List<String>): AboutCmd =
-            AboutCmd(params.extractFlagsRaw().createFlagDataList(registeredFlags))
+        fun parse(params: List<String>): AboutCommand =
+            AboutCommand(params.extractFlagsRaw().createFlagDataList(registeredFlags))
                 .apply { if (!isValid(registeredFlags)) error("Missing required options") }
     }
 
