@@ -6,9 +6,13 @@ import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.html.currentTimeMillis
+import java.text.SimpleDateFormat
 import java.util.*
 
+
 private const val STALE_DATA_INTERVAL = 86_400_400L // one day in ms
+
+private var DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd")
 
 class AirtableRequester {
 
@@ -37,6 +41,11 @@ class AirtableRequester {
             return _aboutRecords
         }
 
+    fun aboutRecordsFilter(type: String? = null, limit: Int? = null, order: AboutRecord.Order = AboutRecord.Order.START_DATE_DESC) =
+        aboutRecords.filter { type?.let { type -> it.fields.type == type } ?: true }
+            .sortedWith(order.comparator)
+            .let { limit?.let { limit -> it.take(limit) } ?: it }
+
     private suspend fun requestAirtableAbout(): List<AboutRecord> {
         val client = HttpClient(CIO) {
             install(JsonFeature)
@@ -49,3 +58,5 @@ class AirtableRequester {
         return response.records
     }
 }
+
+fun String.airtableDate() = DATE_FORMAT.parse(this)

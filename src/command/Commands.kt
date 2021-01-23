@@ -8,7 +8,11 @@ import kotlinx.html.p
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
+import java.text.SimpleDateFormat
+import java.util.*
 
+
+private val DATE_FORMAT_READABLE = SimpleDateFormat("dd MMMMMMM yyyy")
 
 data class SuggestedCommand(val uri: String, val text: String)
 
@@ -50,7 +54,11 @@ abstract class Command(
             else false
         }
 
-    protected fun findFlag(flagInfo: FlagInfo): FlagData? = flags.find { it.flagInfo == flagInfo }
+    protected fun findFlag(flagInfo: FlagInfo): FlagData? =
+        flags.find { it.flagInfo == flagInfo }
+
+    protected fun getFlagOption(flagInfo: FlagInfo, optionNum: Int): String? =
+        findFlag(flagInfo)?.options?.get(optionNum)
 }
 
 data class FlagInfo(
@@ -149,3 +157,5 @@ fun String.fromMarkdown(): String {
     val parsedTree = MarkdownParser(flavour).buildMarkdownTreeFromString(this)
     return HtmlGenerator(this, parsedTree, flavour).generateHtml()
 }
+
+fun Date.readable() = DATE_FORMAT_READABLE.format(this)

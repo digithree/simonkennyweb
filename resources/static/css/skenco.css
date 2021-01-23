@@ -11,3 +11,12 @@ input[type="text"] {
 img {
     border: solid var(--font-color) 2px;
 }
+
+code::after {
+    content: "";
+    display: inline;
+}
+code::before {
+    content: "";
+    display: inline;
+}

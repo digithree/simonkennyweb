@@ -84,10 +84,13 @@ fun Application.module(testing: Boolean = false) {
                         if (commands.isEmpty()) {
                             with(AboutCommand.default()) {
                                 p {
-                                    +"No command entered, showing default content i.e. "
+                                    +"Default command: "
                                     code { +toUriCmdParam() }
                                 }
+                                p { +"Enter command in text box at bottom to explore website content 😁" }
                             }
+                        } else {
+                            p { code { +commands.joinToString(separator = " && ", transform = { it.toUriCmdParam()}) } }
                         }
                     }
                     commands.takeIf { it.isNotEmpty() }
