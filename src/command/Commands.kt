@@ -2,7 +2,6 @@ package co.simonkenny.web.command
 
 import io.ktor.http.*
 import kotlinx.html.HtmlBlockTag
-import kotlinx.html.code
 import kotlinx.html.div
 import kotlinx.html.p
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
@@ -20,10 +19,14 @@ data class CommandMetadata(val name: String, val params: List<String>)
 
 abstract class Command(
     // Flags added to this command to modify its behaviour.
-    private val flags: List<FlagData> = emptyList()
+    private val flags: List<FlagData>
 ) {
     // Name of this command.
     abstract val name: String
+
+    protected abstract val _registeredFlags: List<FlagInfo>
+
+    protected open val canBeOptionless = false
 
     /**
      * Create URI command param which can be used to recreate this command.
@@ -35,24 +38,32 @@ abstract class Command(
      */
     abstract fun distinctKey(): String
 
+    abstract fun helpRender(block: HtmlBlockTag)
+
     /**
      * Render this command to a HTML block directly.
      */
-    open suspend fun render(block: HtmlBlockTag) =
-        with(block) {
-            div("container") {
-                p {
-                    code { +name }
-                    +" run with params: ${flags.flagsDisplay()}"
+    open suspend fun render(block: HtmlBlockTag) = helpRender(block)
+
+    protected fun checkHelp(block: HtmlBlockTag): Boolean {
+        if (findFlag(FLAG_HELP) != null || !isValid()) {
+            if (!isValid()) {
+                block.div("container") {
+                    p { +"Command options are invalid, showing help" }
                 }
             }
+            helpRender(block)
+            return true
         }
+        return false
+    }
 
-    protected fun isValid(registeredFlags: List<FlagInfo>) =
-        registeredFlags.none { flagInfo ->
-            if (!flagInfo.optional) flags.find { it.flagInfo == flagInfo } == null
-            else false
-        }
+    protected fun isValid() =
+        (flags.isNotEmpty() || canBeOptionless) &&
+                _registeredFlags.none { flagInfo ->
+                    if (!flagInfo.optional) flags.find { it.flagInfo == flagInfo } == null
+                    else false
+                }
 
     protected fun findFlag(flagInfo: FlagInfo): FlagData? =
         flags.find { it.flagInfo == flagInfo }
@@ -77,6 +88,8 @@ data class FlagInfo(
                 else match
             }
 }
+
+val FLAG_HELP = FlagInfo("h", "help")
 
 data class FlagData(val flagInfo: FlagInfo, val options: List<String>) {
     fun toReadableString() = "--${flagInfo.long}" +
@@ -111,6 +124,7 @@ fun parseCommand(command: String): Command? =
             )
         }.let {
             when (it.name) {
+                CMD_HELP -> HelpCommand.parse(it.params)
                 CMD_CONFIG -> ConfigCommand.parse(it.params)
                 CMD_ABOUT -> AboutCommand.parse(it.params)
                 else -> null
@@ -125,12 +139,12 @@ fun List<String>.extractFlagsRaw() =
             // remove whitespace that is not in quotes
         .map { it.replace("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex(), "")}
 
-fun String.extractOptions() =
+fun String.extractOptions(isDefault: Boolean = false) =
     substringAfterLast("=", "")
         .takeIf { it.isNotBlank() }
             // split by comma when not in quotes
         ?.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
-            ?: listOf(this)
+            ?: if (isDefault) listOf(this) else emptyList()
 
 fun List<String>.createFlagDataList(
     flagInfoList: List<FlagInfo>,
@@ -138,7 +152,7 @@ fun List<String>.createFlagDataList(
 ): List<FlagData> =
     mapNotNull {
         flagInfoList.find { flagInfo -> flagInfo.matches(it) }
-            ?.let { flagInfo -> FlagData(flagInfo, it.extractOptions()) }
+            ?.let { flagInfo -> FlagData(flagInfo, it.extractOptions(flagInfo.default)) }
     }.let { list ->
         if (replacer != null) {
             list.map { replacer.invoke(it) }
@@ -158,4 +172,4 @@ fun String.fromMarkdown(): String {
     return HtmlGenerator(this, parsedTree, flavour).generateHtml()
 }
 
-fun Date.readable() = DATE_FORMAT_READABLE.format(this)
+fun Date.readable(): String = DATE_FORMAT_READABLE.format(this)
