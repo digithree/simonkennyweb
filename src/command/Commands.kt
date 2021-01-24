@@ -107,7 +107,14 @@ fun parseCommands(parameters: Parameters): List<Command> =
         .map { it.value }
         .flatten()
         .toList()
+        .map {
+            if (it.contains("&&")) {
+                it.split("&&").map { part -> part.trim() }
+            } else listOf(it)
+        }
+        .flatten()
         .let { parseCommands(it) }
+        .take(3)
 
 fun parseCommands(commands: List<String>): List<Command> =
     commands.mapNotNull { parseCommand(it) }
@@ -131,8 +138,6 @@ fun parseCommand(command: String): Command? =
                 else -> null
             }
         }
-
-
 
 fun List<String>.extractFlagsRaw() =
     map { it.trim() }
@@ -172,5 +177,7 @@ fun String.fromMarkdown(): String {
     val parsedTree = MarkdownParser(flavour).buildMarkdownTreeFromString(this)
     return HtmlGenerator(this, parsedTree, flavour).generateHtml()
 }
+
+fun List<Command>.readable() = joinToString(separator = " && ", transform = { it.toUriCmdParam()})
 
 fun Date.readable(): String = DATE_FORMAT_READABLE.format(this)

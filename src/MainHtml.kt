@@ -42,7 +42,11 @@ fun commonHead(html: HTML, dark: Boolean = false) =
         }
     }
 
-fun promptFooter(block: HtmlBlockTag, suggestedCommands: List<SuggestedCommand> = emptyList()) =
+fun promptFooter(
+    block: HtmlBlockTag,
+    currentCommandString: String = "type command",
+    suggestedCommands: List<SuggestedCommand> = emptyList()
+) =
     with(block) {
         hr { }
         div(DIV_CLASS) {
@@ -52,7 +56,7 @@ fun promptFooter(block: HtmlBlockTag, suggestedCommands: List<SuggestedCommand> 
                         id = "cmd"
                         required = true
                         minLength = "3"
-                        placeholder = "type command"
+                        placeholder = currentCommandString
                     }
                     +" "
                     button(classes = "btn btn-default", type = ButtonType.submit) {

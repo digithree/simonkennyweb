@@ -90,13 +90,13 @@ fun Application.module(testing: Boolean = false) {
                                 p { +"Enter command in text box at bottom to explore website content 😁" }
                             }
                         } else {
-                            p { code { +commands.joinToString(separator = " && ", transform = { it.toUriCmdParam()}) } }
+                            p { code { +commands.readable() } }
                         }
                     }
                     commands.takeIf { it.isNotEmpty() }
                         ?.forEach { runBlocking { it.render(this@body) } }
                         ?: with(AboutCommand.default()) { runBlocking { render(this@body) } }
-                    promptFooter(this, SUGGESTED_COMMANDS)
+                    promptFooter(this, commands.readable(), SUGGESTED_COMMANDS)
                     div(DIV_CLASS) { br { } }
                     configCommand?.run {
                         div(DIV_CLASS) {

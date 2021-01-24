@@ -40,7 +40,7 @@ class AboutCommand private constructor(
             AboutCommand(params.extractFlagsRaw().createFlagDataList(registeredFlags))
     }
 
-    override fun distinctKey(): String = "$name ${findFlag(FLAG_TOPIC)?.flagInfo}"
+    override fun distinctKey(): String = "$name ${findFlag(FLAG_TOPIC)?.toReadableString()}"
 
     override fun helpRender(block: HtmlBlockTag) {
         block.div(DIV_CLASS) {

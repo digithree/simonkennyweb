@@ -37,6 +37,19 @@ class HelpCommand(
 Options:
 -i,--info                     shows more information about this website and why it's
                                   done in this arguably over the top style
+
+Command prompt usage: [command [options]] (&& [command...]) (&& [command...])
+
+    Maximum of 3 commands can be joined.
+    Some commands can only be used once, additional joined commands of that type
+        will be ignored. See usage for each command for further details.
+
+Example: about work
+Example: config --dark && about work
+
+Help is available for each command: [command] --help, or [command] -h
+
+    Help will also be shown for a command if basic conditions / options are not correct.
                 """.trimIndent()
             }
         }
