@@ -92,7 +92,10 @@ fun Application.module(testing: Boolean = false) {
                 body(BODY_CLASS) {
                     br { }
                     div(DIV_CLASS) {
-                        h1 { +"Simon Kenny - personal website" }
+                        h1 {
+                            img(src = "/favicon-32x32.png", classes = "tinytiny")
+                            +" Simon Kenny - personal website"
+                        }
                         if (commands.isEmpty()) {
                             with(AboutCommand.default()) {
                                 p {

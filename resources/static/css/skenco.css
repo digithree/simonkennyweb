@@ -20,6 +20,14 @@ img.thumbnail {
     height: auto;
 }
 
+img.tinytiny {
+    max-width: 16px;
+    max-height: 16px;
+    width: auto;
+    height: auto;
+    border: 0px
+}
+
 code::after {
     content: "";
     display: inline;
