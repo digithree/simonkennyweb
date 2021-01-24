@@ -1,9 +1,9 @@
 package co.simonkenny.web.command
 
+import airtable.AirtableRequester
+import airtable.airtableDate
 import co.simonkenny.web.DIV_CLASS
-import co.simonkenny.web.airtable.data.AboutRecord
-import co.simonkenny.web.airtable.data.AirtableRequester
-import co.simonkenny.web.airtable.data.airtableDate
+import co.simonkenny.web.airtable.about.AboutRecord
 import kotlinx.html.*
 import java.lang.IllegalStateException
 import java.util.*
@@ -42,7 +42,7 @@ class AboutCommand private constructor(
 
     override fun distinctKey(): String = "$name ${findFlag(FLAG_TOPIC)?.toReadableString()}"
 
-    override fun helpRender(block: HtmlBlockTag) {
+    override fun helpRender(block: HtmlBlockTag, friendCodeActive: Boolean) {
         block.div(DIV_CLASS) {
             pre {
                 +"""usage: about <topic> [options]
@@ -59,9 +59,9 @@ Options:
         }
     }
 
-    override suspend fun render(block: HtmlBlockTag) {
-        if (checkHelp(block)) return
-        val aboutRecords = AirtableRequester.getInstance().aboutRecordsFilter(
+    override suspend fun render(block: HtmlBlockTag, friendCodeActive: Boolean) {
+        if (checkHelp(block, friendCodeActive)) return
+        val aboutRecords = AirtableRequester.getInstance().about.aboutRecordsFilter(
             type = getFlagOption(FLAG_TOPIC, 0)?.takeIf { it != TOPIC_ALL },
             limit = getFlagOption(FLAG_LIMIT,0)?.toIntOrNull()?.takeIf { it > 0 },
             order = getFlagOption(FLAG_ORDER,0)?.let { orderKey ->
@@ -69,7 +69,7 @@ Options:
             } ?: AboutRecord.Order.START_DATE_DESC
         )
         block.div(DIV_CLASS) {
-            aboutRecords.map { it.fields }.forEach {
+            aboutRecords.map { it.fields }.takeIf { it.isNotEmpty() }?.forEach {
                 hr { }
                 h1 { +it.title }
                 if (findFlag(FLAG_SHOW_DATES) != null && !it.startDate.isNullOrBlank()) {
@@ -85,6 +85,8 @@ Options:
                             ?: p { em { +this@run } }
                     }
                 it.image?.let { image -> img(src = image, alt = it.title) }
+            } ?: run {
+                em { +"No items available matching options." }
             }
         }
     }

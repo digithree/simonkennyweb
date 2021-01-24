@@ -1,6 +1,6 @@
 package co.simonkenny.web
 
-import co.simonkenny.web.airtable.data.AirtableRequester
+import airtable.AirtableRequester
 import co.simonkenny.web.command.*
 import io.ktor.application.*
 import io.ktor.features.*
@@ -36,6 +36,9 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 /**
  * For AirTable access run the compiled jar with the following option:
  *      -P:ktor.security.airtableApiKey="APIKEY"
+ *
+ * Optionally enable friend code:
+ *      -P:ktor.security.friendCode="FRIEND_CODE"
  */
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
@@ -68,7 +71,7 @@ fun Application.module(testing: Boolean = false) {
 
             configGlobals(this@module) // TODO : find better way to set env vars
 
-            val commands = parseCommands(call.request.queryParameters)
+            var commands = parseCommands(call.request.queryParameters)
 
             var configCommand = ConfigCommand.extract(commands)
                 ?: call.sessions.get<SessionConfig>()?.let { parseCommand(it.configCommand) as ConfigCommand }
@@ -79,6 +82,10 @@ fun Application.module(testing: Boolean = false) {
 
             configCommand?.let { call.sessions.set(SessionConfig(it.toUriCmdParam())) }
                 ?: call.sessions.clear(SessionConfig::javaClass.name)
+
+            val friendCodeActive = configCommand?.friendUnlocked == true
+
+            commands = commands.filterFriendsOnly(friendCodeActive)
 
             call.respondHtml {
                 commonHead(this, configCommand?.dark ?: false)
@@ -99,8 +106,8 @@ fun Application.module(testing: Boolean = false) {
                         }
                     }
                     commands.takeIf { it.isNotEmpty() }
-                        ?.forEach { runBlocking { it.render(this@body) } }
-                        ?: with(AboutCommand.default()) { runBlocking { render(this@body) } }
+                        ?.forEach { runBlocking { it.render(this@body, friendCodeActive) } }
+                        ?: with(AboutCommand.default()) { runBlocking { render(this@body, friendCodeActive) } }
                     promptFooter(this, commands.readable(), SUGGESTED_COMMANDS)
                     div(DIV_CLASS) { br { } }
                     configCommand?.run {

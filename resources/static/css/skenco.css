@@ -12,6 +12,14 @@ img {
     border: solid var(--font-color) 2px;
 }
 
+img.thumbnail {
+    display: block;
+    max-width: 300px;
+    max-height: 300px;
+    width: auto;
+    height: auto;
+}
+
 code::after {
     content: "";
     display: inline;

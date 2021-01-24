@@ -1,35 +1,23 @@
-package co.simonkenny.web.airtable.data
+package co.simonkenny.web.airtable.about
 
+import airtable.STALE_DATA_INTERVAL
+import co.simonkenny.web.airtable.media.MediaRecord
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.html.currentTimeMillis
-import java.text.SimpleDateFormat
 import java.util.*
 
+class AboutRequestWrapper(var token: String) {
 
-private const val STALE_DATA_INTERVAL = 86_400_400L // one day in ms
-
-private var DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd")
-
-class AirtableRequester {
-
-    lateinit var token: String
-
-    companion object {
-        private val INSTANCE = AirtableRequester();
-
-        fun getInstance() = INSTANCE
-    }
-
-    private var aboutLastAccessTime = Date()
+    private var lastAccessTime = Date()
 
     private val _aboutRecords = mutableListOf<AboutRecord>()
     val aboutRecords: List<AboutRecord>
         get () {
-            if (_aboutRecords.isEmpty() || aboutLastAccessTime.before(Date(currentTimeMillis() - STALE_DATA_INTERVAL))) {
+            if (_aboutRecords.isEmpty() || lastAccessTime.before(Date(currentTimeMillis() - STALE_DATA_INTERVAL))) {
                 _aboutRecords.clear()
                 runBlocking {
                     _aboutRecords.addAll(requestAirtableAbout())
@@ -38,7 +26,11 @@ class AirtableRequester {
             return _aboutRecords
         }
 
-    fun aboutRecordsFilter(type: String? = null, limit: Int? = null, order: AboutRecord.Order = AboutRecord.Order.START_DATE_DESC) =
+    fun aboutRecordsFilter(
+        type: String? = null,
+        limit: Int? = null,
+        order: AboutRecord.Order = AboutRecord.Order.START_DATE_DESC
+    ) =
         aboutRecords.filter { type?.let { type -> it.fields.type == type } ?: true }
             .sortedWith(order.comparator)
             .let { limit?.let { limit -> it.take(limit) } ?: it }
@@ -55,5 +47,3 @@ class AirtableRequester {
         return response.records
     }
 }
-
-fun String.airtableDate() = DATE_FORMAT.parse(this)

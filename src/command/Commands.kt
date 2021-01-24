@@ -1,6 +1,7 @@
 package co.simonkenny.web.command
 
 import co.simonkenny.web.DIV_CLASS
+import co.simonkenny.web.FriendCodeLock
 import io.ktor.http.*
 import kotlinx.html.HtmlBlockTag
 import kotlinx.html.div
@@ -29,6 +30,8 @@ abstract class Command(
 
     protected open val canBeOptionless = false
 
+    open val friendsOnly = false
+
     /**
      * Create URI command param which can be used to recreate this command.
      */
@@ -39,21 +42,21 @@ abstract class Command(
      */
     abstract fun distinctKey(): String
 
-    abstract fun helpRender(block: HtmlBlockTag)
+    abstract fun helpRender(block: HtmlBlockTag, friendCodeActive: Boolean)
 
     /**
      * Render this command to a HTML block directly.
      */
-    open suspend fun render(block: HtmlBlockTag) = helpRender(block)
+    open suspend fun render(block: HtmlBlockTag, friendCodeActive: Boolean) = helpRender(block, friendCodeActive)
 
-    protected fun checkHelp(block: HtmlBlockTag): Boolean {
+    protected fun checkHelp(block: HtmlBlockTag, friendCodeActive: Boolean): Boolean {
         if (findFlag(FLAG_HELP) != null || !isValid()) {
             if (!isValid()) {
                 block.div(DIV_CLASS) {
                     p { +"Command options are invalid, showing help" }
                 }
             }
-            helpRender(block)
+            helpRender(block, friendCodeActive)
             return true
         }
         return false
@@ -135,9 +138,15 @@ fun parseCommand(command: String): Command? =
                 CMD_HELP -> HelpCommand.parse(it.params)
                 CMD_CONFIG -> ConfigCommand.parse(it.params)
                 CMD_ABOUT -> AboutCommand.parse(it.params)
+                CMD_MEDIA -> MediaCommand.parse(it.params)
                 else -> null
             }
         }
+
+fun List<Command>.filterFriendsOnly(friendCodeActive: Boolean) =
+    if (!friendCodeActive) {
+        filter { !it.friendsOnly }
+    } else this
 
 fun List<String>.extractFlagsRaw() =
     map { it.trim() }

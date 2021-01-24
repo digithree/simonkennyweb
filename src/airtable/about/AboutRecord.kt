@@ -1,5 +1,7 @@
-package co.simonkenny.web.airtable.data
+package co.simonkenny.web.airtable.about
 
+import airtable.airtableDate
+import airtable.compareAirtableDates
 import kotlin.Comparator
 
 data class AirtableAboutAccessObject(
@@ -13,10 +15,8 @@ data class AboutRecord(
 ) {
     enum class Order(val key: String, val comparator: Comparator<AboutRecord>) {
         ALPHABETICAL("alphabetical", compare { o1, o2 -> o1.fields.name.compareTo(o2.fields.name) }),
-        START_DATE_DESC("newest", compare { o1, o2 ->
-            o1.fields.startDate?.let { o2.fields.startDate?.airtableDate()?.compareTo(it.airtableDate()) } ?: 0}),
-        START_DATE_ASC("oldest", compare { o1, o2 ->
-            o2.fields.startDate?.let { o1.fields.startDate?.airtableDate()?.compareTo(it.airtableDate()) } ?: 0}),
+        START_DATE_DESC("newest", compare { o1, o2 -> compareAirtableDates(o1.fields.startDate, o2.fields.startDate) }),
+        START_DATE_ASC("oldest", compare { o1, o2 -> compareAirtableDates(o1.fields.startDate, o2.fields.startDate, newestFirst = false) })
     }
 
     companion object {
