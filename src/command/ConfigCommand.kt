@@ -1,11 +1,14 @@
 package co.simonkenny.web.command
 
 import co.simonkenny.web.DIV_CLASS
+import co.simonkenny.web.FriendCodeLock
 import kotlinx.html.*
 
 const val CMD_CONFIG = "config"
 
+private val FLAG_FRIEND = FlagInfo("f", "friend")
 private val FLAG_DARK = FlagInfo("d", "dark")
+private val FLAG_LIGHT = FlagInfo("l", "light")
 private val FLAG_THEME = FlagInfo("t", "theme")
 private val FLAG_CLEAR = FlagInfo("c", "clear")
 
@@ -24,12 +27,15 @@ class ConfigCommand private constructor(
 
     val clear = findFlag(FLAG_CLEAR) != null
 
+    val friendUnlocked = FriendCodeLock.getInstance().unlock(getFlagOption(FLAG_FRIEND, 0) ?: "")
+
     companion object {
-        private val registeredFlags = listOf(FLAG_HELP, FLAG_DARK, FLAG_THEME, FLAG_CLEAR)
+        private val registeredFlags = listOf(FLAG_HELP, FLAG_FRIEND, FLAG_DARK, FLAG_LIGHT, FLAG_THEME, FLAG_CLEAR)
 
         private fun flagReplacer(flagData: FlagData) =
             when (flagData.flagInfo) {
                 FLAG_DARK -> FlagData(FLAG_THEME, listOf(FLAG_THEME_OPT_DARK))
+                FLAG_LIGHT -> FlagData(FLAG_THEME, listOf(FLAG_THEME_OPT_LIGHT))
                 else -> flagData
             }
 
@@ -44,14 +50,22 @@ class ConfigCommand private constructor(
 
     override fun helpRender(block: HtmlBlockTag) {
         block.div(DIV_CLASS) {
+            if (findFlag(FLAG_FRIEND) != null && !friendUnlocked) {
+                p { +"Friend code is incorrect" }
+            }
             pre {
                 +"""usage: config [options]
+
+    Note that config is stored as cookie if browser allows. Only stores last config.
 
 Options:
 -h,--help                     shows this help, ignores other commands and flags
 -t=<theme>,--theme=<theme>    set display theme, one of: light (default), dark
 -d,--dark                     alias for --theme=dark
+-l,--light                    alias for --theme=light
 -c,--clear                    clear config (removes cookie if present). ignores other options
+-f=<code>,--friend=<code>     submit friend code, grants access to more of website,
+                                  get in touch with site owner to get friend code.
                 """.trimIndent()
             }
         }
@@ -60,14 +74,22 @@ Options:
     override suspend fun render(block: HtmlBlockTag) {
         if (checkHelp(block)) return
         block.div(DIV_CLASS) {
-            p {
-                when {
-                    clear -> +"Config is cleared."
-                    findFlag(FLAG_THEME)?.options?.contains(FLAG_THEME_OPT_DARK) == true ->
-                        +"Theme set to dark. 🌙"
-                    findFlag(FLAG_THEME)?.options?.contains(FLAG_THEME_OPT_LIGHT) == true ->
-                        +"Theme set to light. ☀️"
-                    else -> +"Unknown config params, you have made an error."
+            if (clear) p { +"Config is cleared." }
+            if (findFlag(FLAG_THEME) != null) {
+                p {
+                    when (getFlagOption(FLAG_THEME, 0)) {
+                        FLAG_THEME_OPT_DARK -> +"Theme set to dark. 🌙"
+                        FLAG_THEME_OPT_LIGHT -> +"Theme set to light. ☀️"
+                        else -> +"Unknown theme, default is light."
+                    }
+                }
+            }
+            if (findFlag(FLAG_FRIEND) != null) {
+                p {
+                    when {
+                        friendUnlocked -> +"Friend code is set."
+                        else -> +"Friend code is incorrect."
+                    }
                 }
             }
         }

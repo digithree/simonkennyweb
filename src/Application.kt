@@ -19,9 +19,14 @@ private val SUGGESTED_COMMANDS = listOf(
 
 
 fun configGlobals(application: Application) {
-    application.environment.config
-        .propertyOrNull("ktor.security.airtableApiKey")!!
-        .run { AirtableRequester.setToken(getString()) }
+    with(application.environment.config) {
+        // mandatory
+        propertyOrNull("ktor.security.airtableApiKey")!!
+            .run { AirtableRequester.getInstance().token = getString() }
+        // optional
+        propertyOrNull("ktor.security.friendCode")
+            ?.run { FriendCodeLock.getInstance().friendCode = getString() }
+    }
 }
 
 data class SessionConfig(val configCommand: String)
@@ -100,6 +105,7 @@ fun Application.module(testing: Boolean = false) {
                     div(DIV_CLASS) { br { } }
                     configCommand?.run {
                         div(DIV_CLASS) {
+                            if (friendUnlocked) h3 { +"Friend code is active." }
                             p {
                                 +"Cookie to keep your custom config is stored, if browser allowed. Use "
                                 code { +"config --clear" }

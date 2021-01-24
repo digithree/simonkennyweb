@@ -16,13 +16,10 @@ private var DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd")
 
 class AirtableRequester {
 
+    lateinit var token: String
+
     companion object {
         private val INSTANCE = AirtableRequester();
-        private lateinit var TOKEN: String
-
-        fun setToken(token: String) {
-            TOKEN = token
-        }
 
         fun getInstance() = INSTANCE
     }
@@ -52,7 +49,7 @@ class AirtableRequester {
         }
         val response: AirtableAboutAccessObject = client.request {
             url("https://api.airtable.com/v0/appeP7oDW7r7B82Zn/about")
-            header("Authorization", "Bearer $TOKEN")
+            header("Authorization", "Bearer $token")
         }
         client.close()
         return response.records
