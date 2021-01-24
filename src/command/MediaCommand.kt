@@ -17,7 +17,10 @@ private val FLAG_ORDER = FlagInfo("o", "order")
 private val FLAG_DETAILS = FlagInfo("d", "details")
 
 private val SERVICE_BASE_URLS = mapOf(
-    "play" to "https://www.igdb.com/games/%s"
+    "play" to "https://www.igdb.com/games/%s",
+    "read" to "https://openlibrary.org/works/%s",
+    "watch" to "https://www.themoviedb.org/%s",
+    "listen" to "https://musicbrainz.org/%s"
 )
 
 private const val TOPIC_ALL = "all"
