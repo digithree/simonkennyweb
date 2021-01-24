@@ -1,5 +1,6 @@
 package co.simonkenny.web.command
 
+import co.simonkenny.web.DIV_CLASS
 import kotlinx.html.*
 import java.lang.IllegalStateException
 import kotlin.jvm.Throws
@@ -29,7 +30,7 @@ class HelpCommand(
     override fun distinctKey() = name
 
     override fun helpRender(block: HtmlBlockTag) {
-        block.div("container") {
+        block.div(DIV_CLASS) {
             pre {
                 +"""usage: help [options]
                     
@@ -43,7 +44,7 @@ Options:
 
     override suspend fun render(block: HtmlBlockTag) {
         checkHelp(block) // continue after
-        block.div("container") {
+        block.div(DIV_CLASS) {
             if (findFlag(FLAG_INFO) != null) {
                 unsafe {
                     +"""
@@ -62,7 +63,7 @@ content, if that's what you want to do.
         }
         parseCommands(listOf("help", "about --help", "config --help"))
             .forEach {
-                block.div("container") { h2 { +it.name } }
+                block.div(DIV_CLASS) { h2 { +it.name } }
                 it.helpRender(block)
             }
     }

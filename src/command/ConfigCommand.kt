@@ -1,5 +1,6 @@
 package co.simonkenny.web.command
 
+import co.simonkenny.web.DIV_CLASS
 import kotlinx.html.*
 
 const val CMD_CONFIG = "config"
@@ -42,7 +43,7 @@ class ConfigCommand private constructor(
     override fun distinctKey(): String = CMD_CONFIG
 
     override fun helpRender(block: HtmlBlockTag) {
-        block.div("container") {
+        block.div(DIV_CLASS) {
             pre {
                 +"""usage: config [options]
 
@@ -58,7 +59,7 @@ Options:
 
     override suspend fun render(block: HtmlBlockTag) {
         if (checkHelp(block)) return
-        block.div("container") {
+        block.div(DIV_CLASS) {
             p {
                 when {
                     clear -> +"Config is cleared."

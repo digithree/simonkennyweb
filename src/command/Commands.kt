@@ -1,5 +1,6 @@
 package co.simonkenny.web.command
 
+import co.simonkenny.web.DIV_CLASS
 import io.ktor.http.*
 import kotlinx.html.HtmlBlockTag
 import kotlinx.html.div
@@ -48,7 +49,7 @@ abstract class Command(
     protected fun checkHelp(block: HtmlBlockTag): Boolean {
         if (findFlag(FLAG_HELP) != null || !isValid()) {
             if (!isValid()) {
-                block.div("container") {
+                block.div(DIV_CLASS) {
                     p { +"Command options are invalid, showing help" }
                 }
             }

@@ -50,9 +50,9 @@ fun Application.module(testing: Boolean = false) {
             if (testing) {
                 call.respondHtml {
                     commonHead(this)
-                    body("terminal") {
+                    body(BODY_CLASS) {
                         br { }
-                        div("container") {
+                        div(DIV_CLASS) {
                             h1 { +"Simon Kenny - personal website" }
                         }
                         p { +"Testing activated, just render simple HTML"}
@@ -77,9 +77,9 @@ fun Application.module(testing: Boolean = false) {
 
             call.respondHtml {
                 commonHead(this, configCommand?.dark ?: false)
-                body("terminal") {
+                body(BODY_CLASS) {
                     br { }
-                    div("container") {
+                    div(DIV_CLASS) {
                         h1 { +"Simon Kenny - personal website" }
                         if (commands.isEmpty()) {
                             with(AboutCommand.default()) {
@@ -97,9 +97,9 @@ fun Application.module(testing: Boolean = false) {
                         ?.forEach { runBlocking { it.render(this@body) } }
                         ?: with(AboutCommand.default()) { runBlocking { render(this@body) } }
                     promptFooter(this, SUGGESTED_COMMANDS)
-                    div("container") { br { } }
+                    div(DIV_CLASS) { br { } }
                     configCommand?.run {
-                        div("container") {
+                        div(DIV_CLASS) {
                             p {
                                 +"Cookie to keep your custom config is stored, if browser allowed. Use "
                                 code { +"config --clear" }

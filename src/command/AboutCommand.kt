@@ -1,5 +1,6 @@
 package co.simonkenny.web.command
 
+import co.simonkenny.web.DIV_CLASS
 import co.simonkenny.web.airtable.data.AboutRecord
 import co.simonkenny.web.airtable.data.AirtableRequester
 import co.simonkenny.web.airtable.data.airtableDate
@@ -42,7 +43,7 @@ class AboutCommand private constructor(
     override fun distinctKey(): String = "$name ${findFlag(FLAG_TOPIC)?.flagInfo}"
 
     override fun helpRender(block: HtmlBlockTag) {
-        block.div("container") {
+        block.div(DIV_CLASS) {
             pre {
                 +"""usage: about <topic> [options]
                     
@@ -67,7 +68,7 @@ Options:
                 AboutRecord.ORDERS.find { it.key == orderKey }
             } ?: AboutRecord.Order.START_DATE_DESC
         )
-        block.div("container") {
+        block.div(DIV_CLASS) {
             aboutRecords.map { it.fields }.forEach {
                 hr { }
                 h1 { +it.title }

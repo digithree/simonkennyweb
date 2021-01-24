@@ -3,6 +3,9 @@ package co.simonkenny.web
 import co.simonkenny.web.command.SuggestedCommand
 import kotlinx.html.*
 
+const val BODY_CLASS = "terminal"
+const val DIV_CLASS = "container"
+
 fun commonHead(html: HTML, dark: Boolean = false) =
     html.head {
         meta { charset = "UTF-8" }
@@ -42,7 +45,7 @@ fun commonHead(html: HTML, dark: Boolean = false) =
 fun promptFooter(block: HtmlBlockTag, suggestedCommands: List<SuggestedCommand> = emptyList()) =
     with(block) {
         hr { }
-        div("container") {
+        div(DIV_CLASS) {
             form(action = "#") {
                 div("form-group") {
                     input(name = "cmd", type = InputType.text) {
