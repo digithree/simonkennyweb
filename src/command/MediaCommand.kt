@@ -84,39 +84,47 @@ Options:
             mediaRecord.map { it.fields }.takeIf { it.isNotEmpty() }?.forEach {
                 hr { }
                 h1 { +it.title }
-                p { em {
-                    +"${it.type.toUpperCase(Locale.US)} - ${it.lastStatus.let { str -> if (str.isNullOrBlank()) "UNKNOWN" else str.toUpperCase(Locale.US) }}"
-                    it.lastUpdate?.takeIf { str -> str.isNotBlank() }?.run { +" (${airtableDate().readable()})" }
-                } }
-                it.rating.takeIf { rating -> (1..5).contains(rating) }
-                    ?.let { rating ->
-                        p {
-                            +"I think it's "
-                            when(rating) {
-                                5 -> "Awesome"
-                                4 -> "Pretty Good"
-                                3 -> "Ok"
-                                2 -> "Poor"
-                                else -> "Terrible"
-                            }.let { str -> b { +str } }
+                table(classes = "table-no-border") {
+                    tr { //(classes = "noborder") {
+                        td(classes = "img-no-border") {
+                            createServiceUrl(it.type, it.serviceId)?.run {
+                                p {
+                                    br { }
+                                    a(href = this@run, target = "_blank") {
+                                        it.image?.let { image -> img(src = image, alt = it.title, classes = "thumbnail") }
+                                            ?: +"Details on 3rd party service"
+                                    }
+                                }
+                            }?: it.image?.let { image -> img(src = image, alt = it.title, classes = "thumbnail") }
                         }
-                    } ?: p { +"I don't know what I think yet" }
-                if (findFlag(FLAG_DETAILS) != null) {
-                    it.description?.takeIf { str -> str.isNotBlank() }?.run { p {+this@run } }
-                    it.comments?.takeIf { str -> str.isNotBlank() }?.run {
-                        h2 { +"Comments" }
-                        p { +this@run }
+                        td(classes = "text-no-border") {
+                            p { em {
+                                +"${it.type.toUpperCase(Locale.US)} - ${it.lastStatus.let { str -> if (str.isNullOrBlank()) "UNKNOWN" else str.toUpperCase(Locale.US) }}"
+                                it.lastUpdate?.takeIf { str -> str.isNotBlank() }?.run { +" (${airtableDate().readable()})" }
+                            } }
+                            it.rating.takeIf { rating -> (1..5).contains(rating) }
+                                ?.let { rating ->
+                                    p {
+                                        +"I think it's "
+                                        when(rating) {
+                                            5 -> "Awesome"
+                                            4 -> "Pretty Good"
+                                            3 -> "Ok"
+                                            2 -> "Poor"
+                                            else -> "Terrible"
+                                        }.let { str -> b { +str } }
+                                    }
+                                } ?: p { +"I don't know what I think yet" }
+                            if (findFlag(FLAG_DETAILS) != null) {
+                                it.description?.takeIf { str -> str.isNotBlank() }?.run { p {+this@run } }
+                            }
+                            it.comments?.takeIf { str -> str.isNotBlank() }?.run {
+                                h2 { +"Comments" }
+                                p { +this@run }
+                            }
+                        }
                     }
                 }
-                createServiceUrl(it.type, it.serviceId)?.run {
-                    p {
-                        br { }
-                        a(href = this@run, target = "_blank") {
-                            it.image?.let { image -> img(src = image, alt = it.title, classes = "thumbnail") }
-                                ?: +"Details on 3rd party service"
-                        }
-                    }
-                }?: it.image?.let { image -> img(src = image, alt = it.title, classes = "thumbnail") }
             } ?: run {
                 em { +"No items available matching options." }
             }
