@@ -18,9 +18,9 @@ private val FLAG_DETAILS = FlagInfo("d", "details")
 
 private val SERVICE_BASE_URLS = mapOf(
     "play" to "https://www.igdb.com/games/%s",
-    "read" to "https://openlibrary.org/works/%s",
+    "read" to "https://www.goodreads.com/book/show/%s",
     "watch" to "https://www.themoviedb.org/%s",
-    "listen" to "https://musicbrainz.org/%s"
+    "listen" to "https://www.listennotes.com/podcasts/%s"
 )
 
 private const val TOPIC_ALL = "all"
@@ -62,7 +62,7 @@ Options:
 -h,--help                     shows this help, ignores other commands and flags
 -t=<type>,--type=<type>       topic to show item about,
                                   one of: play, watch, read, listen, all
--l=<limit>,--limit=<limit>    positive integer, show number of items up to limit
+-l=<limit>,--limit=<limit>    positive integer between 1 to 30, show number of items up to limit
 -o=<order>,--order=<order>    order to show items in, default is updated,
                                   one of: updated, title, status, rating
 -d,--details                  show more details for each media item
@@ -73,9 +73,9 @@ Options:
 
     override suspend fun render(block: HtmlBlockTag, friendCodeActive: Boolean) {
         if (checkHelp(block, friendCodeActive)) return
-        val mediaRecord = AirtableRequester.getInstance().media.mediaRecordsFilter(
+        val mediaRecord = AirtableRequester.getInstance().media.fetch(
             type = getFlagOption(FLAG_TOPIC, 0)?.takeIf { it != TOPIC_ALL },
-            limit = getFlagOption(FLAG_LIMIT,0)?.toIntOrNull()?.takeIf { it > 0 },
+            limit = getFlagOption(FLAG_LIMIT,0)?.toIntOrNull()?.takeIf { it > 0 } ?: 30,
             order = getFlagOption(FLAG_ORDER,0)?.let { orderKey ->
                 MediaRecord.ORDERS.find { it.key == orderKey }
             } ?: MediaRecord.Order.UPDATED
@@ -97,10 +97,10 @@ Options:
                                 4 -> "Pretty Good"
                                 3 -> "Ok"
                                 2 -> "Poor"
-                                else -> "Terrible" //1
+                                else -> "Terrible"
                             }.let { str -> b { +str } }
                         }
-                    }
+                    } ?: p { +"I don't know what I think yet" }
                 if (findFlag(FLAG_DETAILS) != null) {
                     it.description?.takeIf { str -> str.isNotBlank() }?.run { p {+this@run } }
                     it.comments?.takeIf { str -> str.isNotBlank() }?.run {

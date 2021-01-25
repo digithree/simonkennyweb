@@ -1,7 +1,7 @@
 package co.simonkenny.web.airtable.about
 
-import airtable.airtableDate
 import airtable.compareAirtableDates
+import co.simonkenny.web.airtable.IOrder
 import kotlin.Comparator
 
 data class AirtableAboutAccessObject(
@@ -13,10 +13,30 @@ data class AboutRecord(
     val fields: AboutFields,
     val createdTime: String
 ) {
-    enum class Order(val key: String, val comparator: Comparator<AboutRecord>) {
-        ALPHABETICAL("alphabetical", compare { o1, o2 -> o1.fields.name.compareTo(o2.fields.name) }),
-        START_DATE_DESC("newest", compare { o1, o2 -> compareAirtableDates(o1.fields.startDate, o2.fields.startDate) }),
-        START_DATE_ASC("oldest", compare { o1, o2 -> compareAirtableDates(o1.fields.startDate, o2.fields.startDate, newestFirst = false) })
+    enum class Order(
+        override val key: String,
+        override val comparator: Comparator<AboutRecord>,
+        override val field: String,
+        override val direction: String
+    ): IOrder<AboutRecord> {
+        ALPHABETICAL(
+            "alphabetical",
+            compare { o1, o2 -> o1.fields.name.compareTo(o2.fields.name) },
+            "name",
+            "asc"
+        ),
+        START_DATE_DESC(
+            "newest",
+            compare { o1, o2 -> compareAirtableDates(o1.fields.startDate, o2.fields.startDate) },
+            "startDate",
+            "desc"
+        ),
+        START_DATE_ASC(
+            "oldest",
+            compare { o1, o2 -> compareAirtableDates(o1.fields.startDate, o2.fields.startDate, newestFirst = false) },
+            "startDate",
+            "asc"
+        )
     }
 
     companion object {

@@ -1,11 +1,16 @@
 package airtable
 
+import co.simonkenny.web.airtable.RequestWrapper
+import co.simonkenny.web.airtable.about.AboutRecord
 import co.simonkenny.web.airtable.about.AboutRequestWrapper
+import co.simonkenny.web.airtable.about.AirtableAboutAccessObject
+import co.simonkenny.web.airtable.media.AirtableMediaAccessObject
+import co.simonkenny.web.airtable.media.MediaRecord
 import co.simonkenny.web.airtable.media.MediaRequestWrapper
+import io.ktor.client.*
+import io.ktor.client.request.*
 import java.text.SimpleDateFormat
 
-
-const val STALE_DATA_INTERVAL = 86_400_400L // one day in ms
 
 private var DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd")
 
@@ -19,9 +24,23 @@ class AirtableRequester {
         fun getInstance() = INSTANCE
     }
 
-    val about: AboutRequestWrapper by lazy { AboutRequestWrapper(token) }
+    val about: RequestWrapper<AboutRecord> by lazy {
+        RequestWrapper(
+            token,
+            "about"
+        ) { client: HttpClient, block ->
+            client.request<AirtableAboutAccessObject> { block() }.records
+        }
+    }
 
-    val media: MediaRequestWrapper by lazy { MediaRequestWrapper(token) }
+    val media: RequestWrapper<MediaRecord> by lazy {
+        RequestWrapper(
+            token,
+            "media-record"
+        ) { client: HttpClient, block ->
+            client.request<AirtableMediaAccessObject> { block() }.records
+        }
+    }
 }
 
 fun String.airtableDate() = DATE_FORMAT.parse(this)
