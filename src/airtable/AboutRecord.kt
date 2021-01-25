@@ -1,7 +1,6 @@
-package co.simonkenny.web.airtable.about
+package co.simonkenny.web.airtable
 
 import airtable.compareAirtableDates
-import co.simonkenny.web.airtable.IOrder
 import kotlin.Comparator
 
 data class AirtableAboutAccessObject(

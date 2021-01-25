@@ -3,7 +3,7 @@ package co.simonkenny.web.command
 import airtable.AirtableRequester
 import airtable.airtableDate
 import co.simonkenny.web.DIV_CLASS
-import co.simonkenny.web.airtable.media.MediaRecord
+import co.simonkenny.web.airtable.MediaRecord
 import kotlinx.html.*
 import java.lang.IllegalStateException
 import java.util.*

@@ -1,7 +1,5 @@
 package co.simonkenny.web.airtable
 
-import co.simonkenny.web.airtable.about.AboutRecord
-import co.simonkenny.web.airtable.about.AirtableAboutAccessObject
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.json.*
@@ -41,21 +39,8 @@ class RequestWrapper<T>(
                 }
                 header("Authorization", "Bearer $token")
             }
-            /*
-            val response: U = client.request {
-                url("https://api.airtable.com/v0/appeP7oDW7r7B82Zn/$table")
-                if (type != null) parameter("filterByFormula", "{type} = '$type'")
-                header("Authorization", "Bearer $token")
-            }
-             */
             client.close()
         }
         return list
-        /*
-        return about
-            //.filter { type.let { type -> it.fields.type == type } }
-            .sortedWith(order.comparator)
-            .let { limit?.let { limit -> it.take(limit) } ?: it }
-         */
     }
 }
