@@ -63,21 +63,21 @@ fun commonHead(html: HTML, dark: Boolean = false) =
         }
     }
 
-fun promptFooter(
+fun renderPrompt(
     block: HtmlBlockTag,
-    currentCommandString: String = "type command",
-    suggestedCommands: List<SuggestedCommand> = emptyList()
+    hintText: String = "type command",
+    filledInText: String? = null,
+    suggestedCommands: List<SuggestedCommand>? = null
 ) =
     with(block) {
-        hr { }
         div(DIV_CLASS) {
             form(action = "#") {
                 div("form-group") {
                     input(name = "cmd", type = InputType.text) {
                         id = "cmd"
                         required = true
-                        minLength = "3"
-                        placeholder = currentCommandString
+                        placeholder = hintText
+                        filledInText?.run { value = filledInText }
                     }
                     +" "
                     button(classes = "btn btn-default", type = ButtonType.submit) {
@@ -90,7 +90,7 @@ fun promptFooter(
             }
         }
         div("container ahoveroff") {
-            suggestedCommands.forEach {
+            suggestedCommands?.forEach {
                 a(href = it.uri) {
                     button(classes = "btn btn-primary btn-ghost") { +it.text }
                 }

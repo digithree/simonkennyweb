@@ -91,6 +91,7 @@ fun Application.module(testing: Boolean = false) {
                 commonHead(this, configCommand?.dark ?: false)
                 body(BODY_CLASS) {
                     br { }
+                    // page header, always the same
                     div(DIV_CLASS) {
                         h1 {
                             img(src = "/favicon-32x32.png", classes = "tinytiny")
@@ -102,16 +103,20 @@ fun Application.module(testing: Boolean = false) {
                                     +"Default command: "
                                     code { +toUriCmdParam() }
                                 }
-                                p { +"Enter command in text box at bottom to explore website content 😁" }
+                                p { +"Enter command in text box to explore website content 😁" }
                             }
-                        } else {
-                            p { code { +commands.readable() } }
                         }
                     }
+                    // header prompt
+                    renderPrompt(this, commands.readable(), commands.readable())
+                    // render each command
                     commands.takeIf { it.isNotEmpty() }
                         ?.forEach { runBlocking { it.render(this@body, friendCodeActive) } }
                         ?: with(AboutCommand.default()) { runBlocking { render(this@body, friendCodeActive) } }
-                    promptFooter(this, commands.readable(), SUGGESTED_COMMANDS)
+                    div(DIV_CLASS) { hr { } }
+                    // footer prompt
+                    renderPrompt(this, commands.readable(), commands.readable(), SUGGESTED_COMMANDS)
+                    // additional footer data
                     div(DIV_CLASS) { br { } }
                     configCommand?.run {
                         div(DIV_CLASS) {
