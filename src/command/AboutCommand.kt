@@ -4,6 +4,7 @@ import airtable.AirtableRequester
 import airtable.airtableDate
 import co.simonkenny.web.DIV_CLASS
 import co.simonkenny.web.airtable.AboutRecord
+import co.simonkenny.web.airtable.FieldMatcher
 import kotlinx.html.*
 import java.lang.IllegalStateException
 import java.util.*
@@ -62,7 +63,9 @@ Options:
     override suspend fun render(block: HtmlBlockTag, friendCodeActive: Boolean) {
         if (checkHelp(block, friendCodeActive)) return
         val aboutRecords = AirtableRequester.getInstance().about.fetch(
-            type = getFlagOption(FLAG_TOPIC, 0)?.takeIf { it != TOPIC_ALL },
+            fieldMatchers = listOfNotNull(
+                getFlagOption(FLAG_TOPIC, 0)?.takeIf { it != TOPIC_ALL }?.let { FieldMatcher("type", it) }
+            ),
             limit = getFlagOption(FLAG_LIMIT,0)?.toIntOrNull()?.takeIf { it > 0 },
             order = getFlagOption(FLAG_ORDER,0)?.let { orderKey ->
                 AboutRecord.ORDERS.find { it.key == orderKey }

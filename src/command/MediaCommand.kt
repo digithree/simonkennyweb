@@ -3,6 +3,7 @@ package co.simonkenny.web.command
 import airtable.AirtableRequester
 import airtable.airtableDate
 import co.simonkenny.web.DIV_CLASS
+import co.simonkenny.web.airtable.FieldMatcher
 import co.simonkenny.web.airtable.MediaRecord
 import kotlinx.html.*
 import java.lang.IllegalStateException
@@ -14,6 +15,7 @@ const val CMD_MEDIA = "media"
 private val FLAG_TOPIC = FlagInfo("t", "topic", default = true, optional = false)
 private val FLAG_LIMIT = FlagInfo("l", "limit")
 private val FLAG_ORDER = FlagInfo("o", "order")
+private val FLAG_STATUS = FlagInfo("s", "status")
 private val FLAG_DETAILS = FlagInfo("d", "details")
 
 private val SERVICE_BASE_URLS = mapOf(
@@ -42,7 +44,7 @@ class MediaCommand(
     override val friendsOnly = true
 
     companion object {
-        private val registeredFlags = listOf(FLAG_HELP, FLAG_TOPIC, FLAG_LIMIT, FLAG_ORDER, FLAG_DETAILS)
+        private val registeredFlags = listOf(FLAG_HELP, FLAG_TOPIC, FLAG_LIMIT, FLAG_ORDER, FLAG_STATUS, FLAG_DETAILS)
 
         @Throws(IllegalStateException::class)
         fun parse(params: List<String>): MediaCommand =
@@ -65,6 +67,9 @@ Options:
 -l=<limit>,--limit=<limit>    positive integer between 1 to 30, show number of items up to limit
 -o=<order>,--order=<order>    order to show items in, default is updated,
                                   one of: updated, title, status, rating
+-s=<status>,--status=<status> filter by status, matching <status>,
+                                  one of: want, ready, queued, started, partial, nearly,
+                                          complete, ongoing, abandoned, paused
 -d,--details                  show more details for each media item
                 """.trimIndent()
             }
@@ -74,11 +79,19 @@ Options:
     override suspend fun render(block: HtmlBlockTag, friendCodeActive: Boolean) {
         if (checkHelp(block, friendCodeActive)) return
         val mediaRecord = AirtableRequester.getInstance().media.fetch(
-            type = getFlagOption(FLAG_TOPIC, 0)?.takeIf { it != TOPIC_ALL },
+            fieldMatchers = listOfNotNull(
+                getFlagOption(FLAG_TOPIC, 0)?.takeIf { it != TOPIC_ALL }?.let { FieldMatcher("type", it) },
+                getFlagOption(FLAG_STATUS,0)?.let { FieldMatcher("lastStatus", it) }
+            ),
             limit = getFlagOption(FLAG_LIMIT,0)?.toIntOrNull()?.takeIf { it > 0 } ?: 30,
-            order = getFlagOption(FLAG_ORDER,0)?.let { orderKey ->
-                MediaRecord.ORDERS.find { it.key == orderKey }
-            } ?: MediaRecord.Order.UPDATED
+            order = try {
+                getFlagOption(FLAG_ORDER,0)?.let { orderKey ->
+                    MediaRecord.ORDERS.find { it.key == orderKey }
+                } ?: MediaRecord.Order.UPDATED
+            } catch (e: Exception) {
+                e.printStackTrace()
+                MediaRecord.Order.UPDATED
+            }
         )
         block.div(DIV_CLASS) {
             mediaRecord.map { it.fields }.takeIf { it.isNotEmpty() }?.forEach {
