@@ -37,19 +37,30 @@ code::before {
     display: inline;
 }
 
-table.table-no-border {
-    margin: 0px
+img.leftfloat {
+    float: left;
+    margin: 0px 15px 15px 0px;
 }
 
-table td.img-no-border,
-table th.img-no-border {
-    border: none;
-    padding: 0px;
+.group:before,
+.group:after {
+    content: "";
+    display: table;
+}
+.group:after {
+    clear: both;
+}
+.group {
+    clear: both;
+    *zoom: 1;
 }
 
-table td.text-no-border,
-table th.text-no-border {
-    border: none;
-    padding: 30px;
+.textblock {
     width: 100%;
+}
+
+@media screen and (max-width: 600px) {
+    .textblock {
+        clear: both;
+    }
 }
