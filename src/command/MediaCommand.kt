@@ -8,6 +8,7 @@ import co.simonkenny.web.airtable.MediaFields
 import co.simonkenny.web.airtable.MediaRecord
 import kotlinx.html.*
 import java.lang.IllegalStateException
+import java.lang.NumberFormatException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.jvm.Throws
@@ -18,6 +19,7 @@ private val FLAG_TOPIC = FlagInfo("t", "topic", default = true, optional = false
 private val FLAG_LIMIT = FlagInfo("l", "limit")
 private val FLAG_ORDER = FlagInfo("o", "order")
 private val FLAG_STATUS = FlagInfo("s", "status")
+private val FLAG_RATING = FlagInfo("r", "rating", )
 private val FLAG_COMMENTS = FlagInfo("c", "comments")
 private val FLAG_DETAILS = FlagInfo("d", "details")
 private val FLAG_GROUP = FlagInfo("g", "group", )
@@ -64,7 +66,7 @@ class MediaCommand(
 
     companion object {
         private val registeredFlags = listOf(
-            FLAG_HELP, FLAG_TOPIC, FLAG_LIMIT, FLAG_ORDER, FLAG_COMMENTS, FLAG_STATUS, FLAG_DETAILS, FLAG_GROUP)
+            FLAG_HELP, FLAG_TOPIC, FLAG_LIMIT, FLAG_ORDER, FLAG_COMMENTS, FLAG_STATUS, FLAG_RATING, FLAG_DETAILS, FLAG_GROUP)
 
         @Throws(IllegalStateException::class)
         fun parse(params: List<String>): MediaCommand =
@@ -90,6 +92,8 @@ Options:
 -s=<status>,--status=<status> filter by status, matching <status>,
                                   one of: want, ready, queued, started, partial, nearly,
                                           complete, ongoing, abandoned, paused
+-r=<rating>,--rating=<rating> filter by rating, matching <rating>,
+                                  number between 1 and 5 inclusive,
 -c=<opt>,--comments=<opt>     show comments for each media item, on by default unless grouping,
                                   one of: on, off
 -d,--details                  show more details for each media item
@@ -105,7 +109,14 @@ Options:
         val mediaRecord = AirtableRequester.getInstance().media.fetch(
             fieldMatchers = listOfNotNull(
                 getFlagOption(FLAG_TOPIC)?.takeIf { it != TOPIC_ALL }?.let { FieldMatcher("type", it) },
-                getFlagOption(FLAG_STATUS)?.let { FieldMatcher("lastStatus", it) }
+                getFlagOption(FLAG_STATUS)?.let { FieldMatcher("lastStatus", it) },
+                getFlagOption(FLAG_RATING)?.takeIf {
+                    try {
+                        (1..5).contains(it.toInt())
+                    } catch (e: NumberFormatException) {
+                        false
+                    }
+                }?.let { FieldMatcher("rating", it) }
             ),
             limit = getFlagOption(FLAG_LIMIT)?.toIntOrNull()?.takeIf { it > 0 } ?: 30,
             order = try {
