@@ -80,12 +80,12 @@ Options:
         if (checkHelp(block, friendCodeActive)) return
         val mediaRecord = AirtableRequester.getInstance().media.fetch(
             fieldMatchers = listOfNotNull(
-                getFlagOption(FLAG_TOPIC, 0)?.takeIf { it != TOPIC_ALL }?.let { FieldMatcher("type", it) },
-                getFlagOption(FLAG_STATUS,0)?.let { FieldMatcher("lastStatus", it) }
+                getFlagOption(FLAG_TOPIC)?.takeIf { it != TOPIC_ALL }?.let { FieldMatcher("type", it) },
+                getFlagOption(FLAG_STATUS)?.let { FieldMatcher("lastStatus", it) }
             ),
-            limit = getFlagOption(FLAG_LIMIT,0)?.toIntOrNull()?.takeIf { it > 0 } ?: 30,
+            limit = getFlagOption(FLAG_LIMIT)?.toIntOrNull()?.takeIf { it > 0 } ?: 30,
             order = try {
-                getFlagOption(FLAG_ORDER,0)?.let { orderKey ->
+                getFlagOption(FLAG_ORDER)?.let { orderKey ->
                     MediaRecord.ORDERS.find { it.key == orderKey }
                 } ?: MediaRecord.Order.UPDATED
             } catch (e: Exception) {

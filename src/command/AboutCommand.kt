@@ -64,10 +64,10 @@ Options:
         if (checkHelp(block, friendCodeActive)) return
         val aboutRecords = AirtableRequester.getInstance().about.fetch(
             fieldMatchers = listOfNotNull(
-                getFlagOption(FLAG_TOPIC, 0)?.takeIf { it != TOPIC_ALL }?.let { FieldMatcher("type", it) }
+                getFlagOption(FLAG_TOPIC)?.takeIf { it != TOPIC_ALL }?.let { FieldMatcher("type", it) }
             ),
-            limit = getFlagOption(FLAG_LIMIT,0)?.toIntOrNull()?.takeIf { it > 0 },
-            order = getFlagOption(FLAG_ORDER,0)?.let { orderKey ->
+            limit = getFlagOption(FLAG_LIMIT)?.toIntOrNull()?.takeIf { it > 0 },
+            order = getFlagOption(FLAG_ORDER)?.let { orderKey ->
                 AboutRecord.ORDERS.find { it.key == orderKey }
             } ?: AboutRecord.Order.START_DATE_DESC
         )

@@ -72,7 +72,7 @@ abstract class Command(
     protected fun findFlag(flagInfo: FlagInfo): FlagData? =
         flags.find { it.flagInfo == flagInfo }
 
-    protected fun getFlagOption(flagInfo: FlagInfo, optionNum: Int): String? =
+    protected fun getFlagOption(flagInfo: FlagInfo, optionNum: Int = 0): String? =
         findFlag(flagInfo)?.options?.get(optionNum)
 }
 

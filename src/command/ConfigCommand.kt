@@ -27,7 +27,7 @@ class ConfigCommand private constructor(
 
     val clear = findFlag(FLAG_CLEAR) != null
 
-    val friendUnlocked = FriendCodeLock.getInstance().unlock(getFlagOption(FLAG_FRIEND, 0) ?: "")
+    val friendUnlocked = FriendCodeLock.getInstance().unlock(getFlagOption(FLAG_FRIEND) ?: "")
 
     companion object {
         private val registeredFlags = listOf(FLAG_HELP, FLAG_FRIEND, FLAG_DARK, FLAG_LIGHT, FLAG_THEME, FLAG_CLEAR)
@@ -77,7 +77,7 @@ Options:
             if (clear) p { +"Config is cleared." }
             if (findFlag(FLAG_THEME) != null) {
                 p {
-                    when (getFlagOption(FLAG_THEME, 0)) {
+                    when (getFlagOption(FLAG_THEME)) {
                         FLAG_THEME_OPT_DARK -> +"Theme set to dark. 🌙"
                         FLAG_THEME_OPT_LIGHT -> +"Theme set to light. ☀️"
                         else -> +"Unknown theme, default is light."
