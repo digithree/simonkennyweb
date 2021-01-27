@@ -18,8 +18,9 @@ private val FLAG_TOPIC = FlagInfo("t", "topic", default = true, optional = false
 private val FLAG_LIMIT = FlagInfo("l", "limit")
 private val FLAG_ORDER = FlagInfo("o", "order")
 private val FLAG_STATUS = FlagInfo("s", "status")
+private val FLAG_COMMENTS = FlagInfo("c", "comments")
 private val FLAG_DETAILS = FlagInfo("d", "details")
-private val FLAG_GROUP = FlagInfo("g", "group")
+private val FLAG_GROUP = FlagInfo("g", "group", )
 
 private val SERVICE_BASE_URLS = mapOf(
     "play" to "https://www.igdb.com/games/%s",
@@ -29,6 +30,9 @@ private val SERVICE_BASE_URLS = mapOf(
 )
 
 private const val TOPIC_ALL = "all"
+
+private const val COMMENTS_ON = "on"
+private const val COMMENTS_OFF = "on"
 
 private const val GROUP_NONE = "none"
 private const val GROUP_YEAR = "year"
@@ -60,7 +64,7 @@ class MediaCommand(
 
     companion object {
         private val registeredFlags = listOf(
-            FLAG_HELP, FLAG_TOPIC, FLAG_LIMIT, FLAG_ORDER, FLAG_STATUS, FLAG_DETAILS, FLAG_GROUP)
+            FLAG_HELP, FLAG_TOPIC, FLAG_LIMIT, FLAG_ORDER, FLAG_COMMENTS, FLAG_STATUS, FLAG_DETAILS, FLAG_GROUP)
 
         @Throws(IllegalStateException::class)
         fun parse(params: List<String>): MediaCommand =
@@ -86,6 +90,8 @@ Options:
 -s=<status>,--status=<status> filter by status, matching <status>,
                                   one of: want, ready, queued, started, partial, nearly,
                                           complete, ongoing, abandoned, paused
+-c=<opt>,--comments=<opt>     show comments for each media item, on by default unless grouping,
+                                  one of: on, off
 -d,--details                  show more details for each media item
 -g=<group>,--g=<group>        grouping to apply, default is none,
                                   one of: none, year, month
@@ -194,15 +200,30 @@ Options:
                                 }.let { str -> b { +str } }
                             }
                         } ?: p { +"I don't know what I think yet" }
-                    if (renderSize == RenderSize.LARGE) {
-                        if (findFlag(FLAG_DETAILS) != null) {
-                            it.description?.takeIf { str -> str.isNotBlank() }?.run { p {+this@run } }
+                    var longText = false
+                    if (findFlag(FLAG_DETAILS) != null) {
+                        it.description?.takeIf { str -> str.isNotBlank() }?.run {
+                            if (renderSize == RenderSize.SMALL) {
+                                br { }
+                                br { }
+                            }
+                            p {+this@run }
                         }
+                        longText = true
+                    }
+                    if (getFlagOption(FLAG_COMMENTS) == COMMENTS_ON
+                            || (findFlag(FLAG_COMMENTS) == null &&  renderSize == RenderSize.LARGE)) {
                         it.comments?.takeIf { str -> str.isNotBlank() }?.run {
+                            if (!longText && renderSize == RenderSize.SMALL) {
+                                br { }
+                                br { }
+                            }
                             h2 { +"Comments" }
                             p { +this@run }
                         }
+                        longText = true
                     }
+                    if (longText && renderSize == RenderSize.SMALL) hr { }
                 }
             }
         }
