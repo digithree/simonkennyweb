@@ -77,28 +77,30 @@ class MediaCommand(
 
     override fun helpRender(block: HtmlBlockTag, friendCodeActive: Boolean) {
         block.div(DIV_CLASS) {
-            pre {
+            pre(classes = "scroll") {
                 +"""usage: media <topic> [options]
 
     This command only available to friends.
                     
 Options:
--h,--help                     shows this help, ignores other commands and flags
--t=<type>,--type=<type>       topic to show item about,
-                                  one of: play, watch, read, listen, all
--l=<limit>,--limit=<limit>    positive integer between 1 to 30, show number of items up to limit
--o=<order>,--order=<order>    order to show items in, default is updated,
-                                  one of: updated, title, status, rating
--s=<status>,--status=<status> filter by status, matching <status>,
-                                  one of: want, ready, queued, started, partial, nearly,
-                                          complete, ongoing, abandoned, paused
--r=<rating>,--rating=<rating> filter by rating, matching <rating>,
-                                  number between 1 and 5 inclusive,
--c=<opt>,--comments=<opt>     show comments for each media item, on by default unless grouping,
-                                  one of: on, off
--d,--details                  show more details for each media item
--g=<group>,--g=<group>        grouping to apply, default is none,
-                                  one of: none, year, month
+-h,--help             shows this help, ignores other commands and flags
+-t=<?>,--type=<?>     topic to show item about,
+                          one of: play, watch, read, listen, all
+-l=<?>,--limit=<?>    positive integer between 1 to 30, show number of
+                          items up to limit
+-o=<?>,--order=<?>    order to show items in, default is updated,
+                          one of: updated, title, status, rating
+-s=<?>,--status=<?>   filter by status, matching <status>,
+                          one of: want, ready, queued, started, partial,
+                                  nearly, complete, ongoing, abandoned,
+                                  paused
+-r=<?>,--rating=<?>   filter by rating, matching <rating>,
+                          number between 1 and 5 inclusive,
+-c=<?>,--comments=<?> show comments for each media item, on by default
+                          unless grouping, one of: on, off
+-d,--details          show more details for each media item
+-g=<?>,--g=<?>        grouping to apply, default is none,
+                          one of: none, year, month
                 """.trimIndent()
             }
         }

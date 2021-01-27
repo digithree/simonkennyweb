@@ -31,12 +31,12 @@ class HelpCommand(
 
     override fun helpRender(block: HtmlBlockTag, friendCodeActive: Boolean) {
         block.div(DIV_CLASS) {
-            pre {
+            pre(classes = "scroll") {
                 +"""usage: help [options]
                     
 Options:
--i,--info                     shows more information about this website and why it's
-                                  done in this arguably over the top style
+-i,--info             shows more information about this website and why it's
+                          done in this arguably over the top style
 
 Command prompt usage: [command [options]] (&& [command...]) (&& [command...])
 

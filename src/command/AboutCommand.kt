@@ -45,16 +45,16 @@ class AboutCommand private constructor(
 
     override fun helpRender(block: HtmlBlockTag, friendCodeActive: Boolean) {
         block.div(DIV_CLASS) {
-            pre {
+            pre(classes = "scroll") {
                 +"""usage: about <topic> [options]
                     
 Options:
--h,--help                     shows this help, ignores other commands and flags
--t=<type>,--type=<type>       topic to show item about,
-                                  one of: project, education, work, personal, all
--l=<limit>,--limit=<limit>    positive integer, show number of items up to limit
--o=<order>,--order=<order>    order to show items in, one of: newest, oldest, alphabetical
--sd,--show-dates              shows dates in item display (off by default)
+-h,--help               shows this help, ignores other commands and flags
+-t=<?>,--type=<?>       topic to show item about,
+                            one of: project, education, work, personal, all
+-l=<?>,--limit=<?>      positive integer, show number of items up to limit
+-o=<?>,--order=<?>      order to show items in, one of: newest, oldest, alphabetical
+-sd,--show-dates        shows dates in item display (off by default)
                 """.trimIndent()
             }
         }

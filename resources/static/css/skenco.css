@@ -72,3 +72,8 @@ img.leftfloat {
         clear: both;
     }
 }
+
+pre.scroll {
+    overflow-x: auto;
+    white-space: pre;
+}

@@ -53,19 +53,19 @@ class ConfigCommand private constructor(
             if (findFlag(FLAG_FRIEND) != null && !friendUnlocked) {
                 p { +"Friend code is incorrect" }
             }
-            pre {
+            pre(classes = "scroll") {
                 +"""usage: config [options]
 
     Note that config is stored as cookie if browser allows. Only stores last config.
 
 Options:
--h,--help                     shows this help, ignores other commands and flags
--t=<theme>,--theme=<theme>    set display theme, one of: light (default), dark
--d,--dark                     alias for --theme=dark
--l,--light                    alias for --theme=light
--c,--clear                    clear config (removes cookie if present). ignores other options
--f=<code>,--friend=<code>     submit friend code, grants access to more of website,
-                                  get in touch with site owner to get friend code.
+-h,--help             shows this help, ignores other commands and flags
+-t=<?>,--theme=<?>    set display theme, one of: light (default), dark
+-d,--dark             alias for --theme=dark
+-l,--light            alias for --theme=light
+-c,--clear            clear config (removes cookie if present). ignores other options
+-f=<?>,--friend=<?>   submit friend code, grants access to more of website,
+                          get in touch with site owner to get friend code.
                 """.trimIndent()
             }
         }
