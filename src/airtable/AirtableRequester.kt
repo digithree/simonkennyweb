@@ -6,6 +6,7 @@ import io.ktor.client.request.*
 import java.text.SimpleDateFormat
 import java.util.*
 
+const val LIMIT_MAX = 100
 
 private var DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd")
 

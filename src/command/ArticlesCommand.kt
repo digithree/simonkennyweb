@@ -1,6 +1,7 @@
 package co.simonkenny.web.command
 
 import airtable.AirtableRequester
+import airtable.LIMIT_MAX
 import airtable.airtableDate
 import co.simonkenny.web.DIV_CLASS
 import co.simonkenny.web.airtable.*
@@ -70,7 +71,7 @@ class ArticlesCommand(
                     
 Options:
 -h,--help             shows this help, ignores other commands and flags
--l=<?>,--limit=<?>    positive integer between 1 to 30, show number of
+-l=<?>,--limit=<?>    positive integer between 1 to $LIMIT_MAX, show number of
                           items up to limit
 -o=<?>,--order=<?>    order to show items in, default is newest-add,
                           one of: newestadd, newestpub
@@ -94,7 +95,7 @@ Options:
         } } }
         if (checkHelp(block, friendCodeActive)) return
         val articlesRecord = AirtableRequester.getInstance().articles.fetch(
-            limit = getFlagOption(FLAG_LIMIT)?.toIntOrNull()?.takeIf { it > 0 } ?: 30,
+            limit = getFlagOption(FLAG_LIMIT)?.toIntOrNull()?.takeIf { it > 0 } ?: LIMIT_MAX,
             order = try {
                 getFlagOption(FLAG_ORDER)?.let { orderKey ->
                     ArticlesRecord.ORDERS.find { it.key == orderKey }
@@ -161,7 +162,8 @@ Options:
                         +" | "
                     }
                     a(href = it.url, target = "_blank") { +it.title }
-                    it.published?.run { +" - ${airtableDate().readable()}" }
+                    br { }
+                    it.published?.run { +airtableDate().readable() }
                 }
                 var longText = false
                 if (findFlag(FLAG_DETAILS) != null || renderSize == RenderSize.LARGE) {

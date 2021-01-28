@@ -1,6 +1,7 @@
 package co.simonkenny.web.command
 
 import airtable.AirtableRequester
+import airtable.LIMIT_MAX
 import airtable.airtableDate
 import co.simonkenny.web.DIV_CLASS
 import co.simonkenny.web.airtable.FieldMatcher
@@ -86,7 +87,7 @@ Options:
 -h,--help             shows this help, ignores other commands and flags
 -t=<?>,--type=<?>     topic to show item about,
                           one of: play, watch, read, listen, all
--l=<?>,--limit=<?>    positive integer between 1 to 30, show number of
+-l=<?>,--limit=<?>    positive integer between 1 to $LIMIT_MAX, show number of
                           items up to limit
 -o=<?>,--order=<?>    order to show items in, default is updated,
                           one of: updated, title, status, rating
@@ -120,7 +121,7 @@ Options:
                     }
                 }?.let { FieldMatcher("rating", it) }
             ),
-            limit = getFlagOption(FLAG_LIMIT)?.toIntOrNull()?.takeIf { it > 0 } ?: 30,
+            limit = getFlagOption(FLAG_LIMIT)?.toIntOrNull()?.takeIf { it > 0 } ?: LIMIT_MAX,
             order = try {
                 getFlagOption(FLAG_ORDER)?.let { orderKey ->
                     MediaRecord.ORDERS.find { it.key == orderKey }
