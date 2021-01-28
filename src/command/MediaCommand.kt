@@ -22,7 +22,7 @@ private val FLAG_STATUS = FlagInfo("s", "status")
 private val FLAG_RATING = FlagInfo("r", "rating", )
 private val FLAG_COMMENTS = FlagInfo("c", "comments")
 private val FLAG_DETAILS = FlagInfo("d", "details")
-private val FLAG_GROUP = FlagInfo("g", "group", )
+private val FLAG_GROUP = FlagInfo("g", "group")
 
 private val SERVICE_BASE_URLS = mapOf(
     "play" to "https://www.igdb.com/games/%s",
@@ -34,13 +34,13 @@ private val SERVICE_BASE_URLS = mapOf(
 private const val TOPIC_ALL = "all"
 
 private const val COMMENTS_ON = "on"
-private const val COMMENTS_OFF = "on"
+private const val COMMENTS_OFF = "off"
 
 private const val GROUP_NONE = "none"
 private const val GROUP_YEAR = "year"
 private const val GROUP_MONTH = "month"
 
-private val GROUP_YEAR_NONE = Calendar.getInstance().apply { set(1970, 1, 1) }.time
+private val GROUP_DATE_NONE = Calendar.getInstance().apply { set(1970, 1, 1) }.time
 private val DATE_FORMAT_GROUP_YEAR = SimpleDateFormat("yyyy")
 private val DATE_FORMAT_GROUP_MONTH = SimpleDateFormat("MMMMMMM yyyy")
 
@@ -54,7 +54,7 @@ class MediaCommand(
     flags: List<FlagData>
 ): Command(flags) {
 
-    enum class RenderSize {
+    private enum class RenderSize {
         LARGE, SMALL
     }
 
@@ -132,22 +132,27 @@ Options:
         )
         block.div(DIV_CLASS) {
             mediaRecord.map { it.fields }.takeIf { it.isNotEmpty() }?.run {
-                val group = getFlagOption(FLAG_GROUP) ?: GROUP_NONE
-                when (group) {
-                    GROUP_YEAR, GROUP_MONTH -> groupBy {
-                            it.lastUpdate?.takeIf { date -> date.isNotBlank() }?.airtableDate()?.let {
+                when (val group = getFlagOption(FLAG_GROUP) ?: GROUP_NONE) {
+                    GROUP_NONE -> forEach {
+                        section(classes = "group") {
+                            hr { }
+                            renderItem(this, it, RenderSize.LARGE)
+                        }
+                    }
+                    else -> groupBy {
+                        it.lastUpdate?.takeIf { date -> date.isNotBlank() }?.airtableDate()?.let {
                                 Calendar.getInstance().apply {
                                     time = it
                                     set(Calendar.DAY_OF_MONTH, 1)
                                     if (group == GROUP_YEAR) set(Calendar.MONTH, 1)
                                 }.time
-                            } ?: GROUP_YEAR_NONE
+                            } ?: GROUP_DATE_NONE
                         }
                         .toSortedMap { o1, o2 -> o2.compareTo(o1) }
                         .forEach { (date, list) ->
                             div(classes = "terminal-card") {
                                 header {
-                                    date.takeIf { it != GROUP_YEAR_NONE }?.run {
+                                    date.takeIf { it != GROUP_DATE_NONE }?.run {
                                         when(group) {
                                             GROUP_YEAR -> DATE_FORMAT_GROUP_YEAR
                                             else -> DATE_FORMAT_GROUP_MONTH
@@ -165,12 +170,6 @@ Options:
                             br { }
                             br { }
                         }
-                    else -> forEach {
-                        section(classes = "group") {
-                            hr { }
-                            renderItem(this, it, RenderSize.LARGE)
-                        }
-                    }
                 }
             } ?: run {
                 em { +"No items available matching options." }

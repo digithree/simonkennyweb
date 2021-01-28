@@ -1,5 +1,6 @@
 package co.simonkenny.web.airtable
 
+import airtable.compare
 import airtable.compareAirtableDates
 import kotlin.Comparator
 
@@ -39,9 +40,6 @@ data class AboutRecord(
     }
 
     companion object {
-        private fun compare(c: (o1: AboutRecord, o2: AboutRecord) -> Int): Comparator<AboutRecord> =
-            Comparator { o1, o2 -> if (o1 == null || o2 == null) 0 else c(o1, o2) }
-
         val ORDERS = listOf(Order.ALPHABETICAL, Order.START_DATE_DESC, Order.START_DATE_ASC)
     }
 }

@@ -1,5 +1,6 @@
 package co.simonkenny.web.airtable
 
+import airtable.compare
 import airtable.compareAirtableDates
 
 data class AirtableMediaAccessObject(
@@ -44,9 +45,6 @@ data class MediaRecord(
     }
 
     companion object {
-        private fun compare(c: (o1: MediaRecord, o2: MediaRecord) -> Int): Comparator<MediaRecord> =
-            Comparator { o1, o2 -> if (o1 == null || o2 == null) 0 else c(o1, o2) }
-
         val ORDERS = listOf(Order.TITLE, Order.STATUS, Order.UPDATED, Order.RATING)
     }
 }

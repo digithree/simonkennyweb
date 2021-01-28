@@ -75,7 +75,7 @@ content, if that's what you want to do.
             }
             p { +"Displaying help for all commands:" }
         }
-        parseCommands(listOf("help", "about --help", "config --help")
+        parseCommands(listOf("help", "about --help", "articles --help", "config --help")
                 .plus(if (friendCodeActive) listOf("media --help") else emptyList() ))
             .forEach {
                 block.div(DIV_CLASS) { h2 { +it.name } }

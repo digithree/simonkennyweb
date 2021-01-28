@@ -139,6 +139,7 @@ fun parseCommand(command: String): Command? =
                 CMD_CONFIG -> ConfigCommand.parse(it.params)
                 CMD_ABOUT -> AboutCommand.parse(it.params)
                 CMD_MEDIA -> MediaCommand.parse(it.params)
+                CMD_ARTICLES -> ArticlesCommand.parse(it.params)
                 else -> null
             }
         }
