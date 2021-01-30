@@ -64,7 +64,7 @@ class ArticlesCommand(
 
     override fun distinctKey(): String = name
 
-    override fun helpRender(block: HtmlBlockTag, friendCodeActive: Boolean) {
+    override fun helpRender(block: HtmlBlockTag, config: ConfigCommand?) {
         block.div(DIV_CLASS) {
             pre(classes = "scroll") {
                 +"""usage: articles [options]
@@ -89,11 +89,11 @@ Options:
         }
     }
 
-    override suspend fun render(block: HtmlBlockTag, friendCodeActive: Boolean) {
+    override suspend fun render(block: HtmlBlockTag, config: ConfigCommand?) {
         block.div(DIV_CLASS) { p { em {
             +"Note: articles here are not endorsed, they are simply of some interest."
         } } }
-        if (checkHelp(block, friendCodeActive)) return
+        if (checkHelp(block, config)) return
         val articlesRecord = AirtableRequester.getInstance().articles.fetch(
             limit = getFlagOption(FLAG_LIMIT)?.toIntOrNull()?.takeIf { it > 0 } ?: LIMIT_MAX,
             order = try {
@@ -113,7 +113,7 @@ Options:
                     GROUP_NONE -> forEach {
                         section(classes = "group") {
                             hr { }
-                            renderItem(this, it, RenderSize.LARGE)
+                            renderItem(this, it, RenderSize.LARGE, config?.dark == true)
                         }
                     }
                     else -> groupBy {
@@ -140,7 +140,7 @@ Options:
                                 div {
                                     list.forEach {
                                         section(classes = "group") {
-                                            renderItem(this, it, RenderSize.SMALL)
+                                            renderItem(this, it, RenderSize.SMALL, config?.dark == true)
                                         }
                                     }
                                 }
@@ -153,12 +153,15 @@ Options:
         }
     }
 
-    private fun renderItem(block: HtmlBlockTag, articlesFields: ArticlesFields, renderSize: RenderSize) {
+    private fun renderItem(block: HtmlBlockTag, articlesFields: ArticlesFields, renderSize: RenderSize, dark: Boolean) {
         with(block) {
             articlesFields.let {
                 p {
                     if (getFlagOption(FLAG_ROW) == null || getFlagOption(FLAG_ROW) == ROW_ON) {
-                        a(href = "https://row.onl/url?q=${URLEncoder.encode(it.url, "UTF-8")}", target = "_blank") { +"[ROW]" }
+                        a(
+                            href = "https://row.onl/url?${if (dark) "theme=2&" else ""}q=${URLEncoder.encode(it.url, "UTF-8")}",
+                            target = "_blank"
+                        ) { +"[ROW]" }
                         +" | "
                     }
                     a(href = it.url, target = "_blank") { +it.title }

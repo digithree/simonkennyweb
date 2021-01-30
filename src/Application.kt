@@ -111,8 +111,8 @@ fun Application.module(testing: Boolean = false) {
                     renderPrompt(this, commands.readable(), commands.readable())
                     // render each command
                     commands.takeIf { it.isNotEmpty() }
-                        ?.forEach { runBlocking { it.render(this@body, friendCodeActive) } }
-                        ?: with(AboutCommand.default()) { runBlocking { render(this@body, friendCodeActive) } }
+                        ?.forEach { runBlocking { it.render(this@body, configCommand) } }
+                        ?: with(AboutCommand.default()) { runBlocking { render(this@body, configCommand) } }
                     div(DIV_CLASS) { hr { } }
                     // footer prompt
                     renderPrompt(this, commands.readable(), commands.readable(), SUGGESTED_COMMANDS)

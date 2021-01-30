@@ -29,7 +29,7 @@ class HelpCommand(
 
     override fun distinctKey() = name
 
-    override fun helpRender(block: HtmlBlockTag, friendCodeActive: Boolean) {
+    override fun helpRender(block: HtmlBlockTag, config: ConfigCommand?) {
         block.div(DIV_CLASS) {
             pre(classes = "scroll") {
                 +"""usage: help [options]
@@ -56,8 +56,8 @@ Help is available for each command: [command] --help, or [command] -h
     }
 
 
-    override suspend fun render(block: HtmlBlockTag, friendCodeActive: Boolean) {
-        checkHelp(block, friendCodeActive) // continue after
+    override suspend fun render(block: HtmlBlockTag, config: ConfigCommand?) {
+        checkHelp(block, config) // continue after
         block.div(DIV_CLASS) {
             if (findFlag(FLAG_INFO) != null) {
                 unsafe {
@@ -76,10 +76,10 @@ content, if that's what you want to do.
             p { +"Displaying help for all commands:" }
         }
         parseCommands(listOf("help", "about --help", "articles --help", "config --help")
-                .plus(if (friendCodeActive) listOf("media --help") else emptyList() ))
+                .plus(if (config?.friendUnlocked == true) listOf("media --help") else emptyList() ))
             .forEach {
                 block.div(DIV_CLASS) { h2 { +it.name } }
-                it.helpRender(block, friendCodeActive)
+                it.helpRender(block, config)
             }
     }
 }

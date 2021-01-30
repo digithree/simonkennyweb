@@ -48,7 +48,7 @@ class ConfigCommand private constructor(
 
     override fun distinctKey(): String = CMD_CONFIG
 
-    override fun helpRender(block: HtmlBlockTag, friendCodeActive: Boolean) {
+    override fun helpRender(block: HtmlBlockTag, config: ConfigCommand?) {
         block.div(DIV_CLASS) {
             if (findFlag(FLAG_FRIEND) != null && !friendUnlocked) {
                 p { +"Friend code is incorrect" }
@@ -71,8 +71,8 @@ Options:
         }
     }
 
-    override suspend fun render(block: HtmlBlockTag, friendCodeActive: Boolean) {
-        if (checkHelp(block, friendCodeActive)) return
+    override suspend fun render(block: HtmlBlockTag, config: ConfigCommand?) {
+        if (checkHelp(block, config)) return
         block.div(DIV_CLASS) {
             if (clear) p { +"Config is cleared." }
             if (findFlag(FLAG_THEME) != null) {

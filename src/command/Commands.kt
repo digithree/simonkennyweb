@@ -42,21 +42,21 @@ abstract class Command(
      */
     abstract fun distinctKey(): String
 
-    abstract fun helpRender(block: HtmlBlockTag, friendCodeActive: Boolean)
+    abstract fun helpRender(block: HtmlBlockTag, config: ConfigCommand?)
 
     /**
      * Render this command to a HTML block directly.
      */
-    open suspend fun render(block: HtmlBlockTag, friendCodeActive: Boolean) = helpRender(block, friendCodeActive)
+    open suspend fun render(block: HtmlBlockTag, config: ConfigCommand?) = helpRender(block, config)
 
-    protected fun checkHelp(block: HtmlBlockTag, friendCodeActive: Boolean): Boolean {
+    protected fun checkHelp(block: HtmlBlockTag, config: ConfigCommand?): Boolean {
         if (findFlag(FLAG_HELP) != null || !isValid()) {
             if (!isValid()) {
                 block.div(DIV_CLASS) {
                     p { +"Command options are invalid, showing help" }
                 }
             }
-            helpRender(block, friendCodeActive)
+            helpRender(block, config)
             return true
         }
         return false

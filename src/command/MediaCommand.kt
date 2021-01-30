@@ -76,7 +76,7 @@ class MediaCommand(
 
     override fun distinctKey(): String = "$name ${findFlag(FLAG_TOPIC)?.toReadableString()}"
 
-    override fun helpRender(block: HtmlBlockTag, friendCodeActive: Boolean) {
+    override fun helpRender(block: HtmlBlockTag, config: ConfigCommand?) {
         block.div(DIV_CLASS) {
             pre(classes = "scroll") {
                 +"""usage: media <topic> [options]
@@ -107,8 +107,8 @@ Options:
         }
     }
 
-    override suspend fun render(block: HtmlBlockTag, friendCodeActive: Boolean) {
-        if (checkHelp(block, friendCodeActive)) return
+    override suspend fun render(block: HtmlBlockTag, config: ConfigCommand?) {
+        if (checkHelp(block, config)) return
         val mediaRecord = AirtableRequester.getInstance().media.fetch(
             fieldMatchers = listOfNotNull(
                 getFlagOption(FLAG_TOPIC)?.takeIf { it != TOPIC_ALL }?.let { FieldMatcher("type", it) },
