@@ -14,6 +14,7 @@ import kotlinx.html.*
 private val SUGGESTED_COMMANDS = listOf(
     SuggestedCommand("/?cmd=help", "help"),
     SuggestedCommand("/?cmd=about+work", "about work"),
+    SuggestedCommand("/?cmd=articles+-g=monthpub", "articles -g=monthpub"),
     SuggestedCommand("/?cmd=config+-d", "config --dark")
 )
 
