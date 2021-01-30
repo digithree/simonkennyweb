@@ -94,7 +94,7 @@ Options:
 -s=<?>,--status=<?>   filter by status, matching <status>,
                           one of: want, ready, queued, started, partial,
                                   nearly, complete, ongoing, abandoned,
-                                  paused
+                                  paused, peeked
 -r=<?>,--rating=<?>   filter by rating, matching <rating>,
                           number between 1 and 5 inclusive,
 -c=<?>,--comments=<?> show comments for each media item, on by default
