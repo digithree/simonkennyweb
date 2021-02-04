@@ -202,15 +202,31 @@ Options:
                     } }
                     it.rating.takeIf { rating -> (1..5).contains(rating) }
                         ?.let { rating ->
-                            p {
-                                +"I think it's "
-                                when(rating) {
-                                    5 -> "Awesome"
-                                    4 -> "Pretty Good"
-                                    3 -> "Ok"
-                                    2 -> "Poor"
-                                    else -> "Terrible"
-                                }.let { str -> b { +str } }
+                            if (it.lastUpdate.isNullOrBlank()) {
+                                p {
+                                    +"I'm "
+                                    when(rating) {
+                                        5 -> "really excited to"
+                                        4 -> "excited to"
+                                        3 -> "going to"
+                                        2 -> "probably won't"
+                                        else -> "very unlikely to"
+                                    }.let { str -> b {
+                                        +str.toUpperCase(Locale.US)
+                                        +" look at this"
+                                    } }
+                                }
+                            } else {
+                                p {
+                                    +"I think it's "
+                                    when(rating) {
+                                        5 -> "awesome"
+                                        4 -> "pretty Good"
+                                        3 -> "ok"
+                                        2 -> "poor"
+                                        else -> "terrible"
+                                    }.let { str -> b { +str.toUpperCase(Locale.US) } }
+                                }
                             }
                         } ?: p { +"I don't know what I think yet" }
                     var longText = false
