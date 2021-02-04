@@ -90,11 +90,11 @@ Options:
 -l=<?>,--limit=<?>    positive integer between 1 to $LIMIT_MAX, show number of
                           items up to limit
 -o=<?>,--order=<?>    order to show items in, default is updated,
-                          one of: updated, title, status, rating
+                          one of: updated, updatedrev, title, status, rating
 -s=<?>,--status=<?>   filter by status, matching <status>,
-                          one of: want, ready, queued, started, partial,
+                          one of: want, ready, peeked, started, partial,
                                   nearly, complete, ongoing, abandoned,
-                                  paused, peeked
+                                  paused
 -r=<?>,--rating=<?>   filter by rating, matching <rating>,
                           number between 1 and 5 inclusive,
 -c=<?>,--comments=<?> show comments for each media item, on by default

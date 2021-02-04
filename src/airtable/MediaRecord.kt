@@ -36,6 +36,12 @@ data class MediaRecord(
             "lastUpdate",
             "desc"
         ),
+        UPDATED_REV(
+            "updatedrev",
+            compare { o1, o2 -> compareAirtableDates(o2.fields.lastUpdate, o1.fields.lastUpdate) },
+            "lastUpdate",
+            "asc"
+        ),
         RATING(
             "rating",
             compare { o1, o2 -> (o2.fields.rating ?: 0).compareTo(o1.fields.rating ?: 0) },
@@ -45,7 +51,7 @@ data class MediaRecord(
     }
 
     companion object {
-        val ORDERS = listOf(Order.TITLE, Order.STATUS, Order.UPDATED, Order.RATING)
+        val ORDERS = listOf(Order.TITLE, Order.STATUS, Order.UPDATED, Order.UPDATED_REV, Order.RATING)
     }
 }
 
