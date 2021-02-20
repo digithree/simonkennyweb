@@ -9,7 +9,7 @@ const val CMD_HELP = "help"
 
 private val FLAG_INFO = FlagInfo("i", "info")
 
-class HelpCommand(
+open class HelpCommand(
     flags: List<FlagData>
 ): Command(flags) {
 
