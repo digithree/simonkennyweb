@@ -202,7 +202,11 @@ Options:
                     } }
                     it.rating.takeIf { rating -> (1..5).contains(rating) }
                         ?.let { rating ->
-                            if (it.lastUpdate.isNullOrBlank()) {
+                            if (it.lastUpdate.isNullOrBlank()
+                                    || it.lastStatus == "want"
+                                    || it.lastStatus == "ready"
+                                    || it.lastStatus == "started"
+                                    || it.lastStatus == "peeked") {
                                 p {
                                     +"I'm "
                                     when(rating) {
@@ -213,7 +217,7 @@ Options:
                                         else -> "very unlikely to"
                                     }.let { str -> b {
                                         +str.toUpperCase(Locale.US)
-                                        +" look at this"
+                                        +" get into this"
                                     } }
                                 }
                             } else {
