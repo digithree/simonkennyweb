@@ -1,7 +1,6 @@
 package co.simonkenny.web.command
 
 import co.simonkenny.web.DIV_CLASS
-import co.simonkenny.web.FriendCodeLock
 import io.ktor.http.*
 import kotlinx.html.HtmlBlockTag
 import kotlinx.html.div
@@ -29,8 +28,6 @@ abstract class Command(
     protected abstract val _registeredFlags: List<FlagInfo>
 
     protected open val canBeOptionless = false
-
-    open val friendsOnly = false
 
     /**
      * Create URI command param which can be used to recreate this command.
@@ -143,11 +140,6 @@ fun parseCommand(command: String): Command? =
                 else -> ErrorCommand.create("${it.name} ${it.params.joinToString(" ")}")
             }
         }
-
-fun List<Command>.filterFriendsOnly(friendCodeActive: Boolean) =
-    if (!friendCodeActive) {
-        filter { !it.friendsOnly }
-    } else this
 
 fun List<String>.extractFlagsRaw() =
     map { it.trim() }

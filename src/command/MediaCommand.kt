@@ -63,11 +63,18 @@ class MediaCommand(
 
     override val _registeredFlags = registeredFlags
 
-    override val friendsOnly = true
-
     companion object {
         private val registeredFlags = listOf(
-            FLAG_HELP, FLAG_TOPIC, FLAG_LIMIT, FLAG_ORDER, FLAG_COMMENTS, FLAG_STATUS, FLAG_RATING, FLAG_DETAILS, FLAG_GROUP)
+            FLAG_HELP,
+            FLAG_TOPIC,
+            FLAG_LIMIT,
+            FLAG_ORDER,
+            FLAG_COMMENTS,
+            FLAG_STATUS,
+            FLAG_RATING,
+            FLAG_DETAILS,
+            FLAG_GROUP
+        )
 
         @Throws(IllegalStateException::class)
         fun parse(params: List<String>): MediaCommand =
@@ -80,8 +87,6 @@ class MediaCommand(
         block.div(DIV_CLASS) {
             pre(classes = "scroll") {
                 +"""usage: media <topic> [options]
-
-    This command only available to friends.
                     
 Options:
 -h,--help             shows this help, ignores other commands and flags
@@ -119,7 +124,8 @@ Options:
                     } catch (e: NumberFormatException) {
                         false
                     }
-                }?.let { FieldMatcher("rating", it) }
+                }?.let { FieldMatcher("rating", it) },
+                if (config?.friendUnlocked != true) FieldMatcher("public", "1") else null
             ),
             limit = getFlagOption(FLAG_LIMIT)?.toIntOrNull()?.takeIf { it > 0 } ?: LIMIT_MAX,
             order = try {
@@ -137,7 +143,7 @@ Options:
                     GROUP_NONE -> forEach {
                         section(classes = "group") {
                             hr { }
-                            renderItem(this, it, RenderSize.LARGE)
+                            renderItem(this, it, RenderSize.LARGE, config)
                         }
                     }
                     else -> groupBy {
@@ -163,7 +169,7 @@ Options:
                                 div {
                                     list.forEach {
                                         section(classes = "group") {
-                                            renderItem(this, it, RenderSize.SMALL)
+                                            renderItem(this, it, RenderSize.SMALL, config)
                                         }
                                     }
                                 }
@@ -175,10 +181,16 @@ Options:
             } ?: run {
                 em { +"No items available matching options." }
             }
+            if (config?.friendUnlocked != true) {
+                p {
+                    hr { }
+                    em { +"Public only enabled, use friend code for full content" }
+                }
+            }
         }
     }
 
-    private fun renderItem(block: HtmlBlockTag, mediaFields: MediaFields, renderSize: RenderSize) {
+    private fun renderItem(block: HtmlBlockTag, mediaFields: MediaFields, renderSize: RenderSize, config: ConfigCommand?) {
         with(block) {
             mediaFields.let {
                 h1 { +it.title }
@@ -198,7 +210,7 @@ Options:
                 section(classes = if (renderSize == RenderSize.LARGE) "textblock" else null) {
                     p { em {
                         +"${it.type.toUpperCase(Locale.US)} - ${it.lastStatus.let { str -> if (str.isNullOrBlank()) "UNKNOWN" else str.toUpperCase(Locale.US) }}"
-                        it.lastUpdate?.takeIf { str -> str.isNotBlank() }?.run { +" (${airtableDate().readable()})" }
+                        if (config?.friendUnlocked == true) it.lastUpdate?.takeIf { str -> str.isNotBlank() }?.run { +" (${airtableDate().readable()})" }
                     } }
                     it.rating.takeIf { rating -> (1..5).contains(rating) }
                         ?.let { rating ->
@@ -240,7 +252,7 @@ Options:
                                 br { }
                                 br { }
                             }
-                            p {+this@run }
+                            p { +this@run }
                         }
                         longText = true
                     }

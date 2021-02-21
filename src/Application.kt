@@ -72,7 +72,7 @@ fun Application.module(testing: Boolean = false) {
 
             configGlobals(this@module) // TODO : find better way to set env vars
 
-            var commands = parseCommands(call.request.queryParameters)
+            val commands = parseCommands(call.request.queryParameters)
 
             var configCommand = ConfigCommand.extract(commands)
                 ?: call.sessions.get<SessionConfig>()?.let { parseCommand(it.configCommand) as ConfigCommand }
@@ -83,10 +83,6 @@ fun Application.module(testing: Boolean = false) {
 
             configCommand?.let { call.sessions.set(SessionConfig(it.toUriCmdParam())) }
                 ?: call.sessions.clear(SessionConfig::javaClass.name)
-
-            val friendCodeActive = configCommand?.friendUnlocked == true
-
-            commands = commands.filterFriendsOnly(friendCodeActive)
 
             call.respondHtml {
                 commonHead(this, configCommand?.dark ?: false)

@@ -65,5 +65,6 @@ data class MediaFields(
     val comments: String?,
     val image: String?,
     val lastUpdate: String?,
-    val lastStatus: String?
+    val lastStatus: String?,
+    val public: String? // Boolean as String
 )
