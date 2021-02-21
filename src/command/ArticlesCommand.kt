@@ -20,7 +20,6 @@ private val FLAG_ORDER = FlagInfo("o", "order")
 private val FLAG_DETAILS = FlagInfo("d", "details")
 private val FLAG_COMMENTS = FlagInfo("c", "comments")
 private val FLAG_GROUP = FlagInfo("g", "group")
-private val FLAG_NSFW = FlagInfo("n", "nsfw")
 private val FLAG_ROW = FlagInfo("r", "row")
 
 private const val COMMENTS_ON = "on"
@@ -55,7 +54,14 @@ class ArticlesCommand(
 
     companion object {
         private val registeredFlags = listOf(
-            FLAG_HELP, FLAG_LIMIT, FLAG_ORDER, FLAG_DETAILS, FLAG_COMMENTS, FLAG_GROUP, FLAG_NSFW, FLAG_ROW)
+            FLAG_HELP,
+            FLAG_LIMIT,
+            FLAG_ORDER,
+            FLAG_DETAILS,
+            FLAG_COMMENTS,
+            FLAG_GROUP,
+            FLAG_ROW
+        )
 
         @Throws(IllegalStateException::class)
         fun parse(params: List<String>): ArticlesCommand =
@@ -83,7 +89,6 @@ Options:
                                         monthadd, monthpub
 -r=<?>,--row=<?>      include ROW link, on by default,
                           one of: on, off
--n,--nsfw             include NSFW content
                 """.trimIndent()
             }
         }
@@ -103,12 +108,13 @@ Options:
             } catch (e: Exception) {
                 e.printStackTrace()
                 ArticlesRecord.Order.NEWEST_ADDED
-            }
+            },
+            fieldMatchers = listOfNotNull(
+                if (config?.friendUnlocked != true) FieldMatcher("public", "1") else null
+            )
         )
-        val nsfw: Boolean = findFlag(FLAG_NSFW) != null
         block.div(DIV_CLASS) {
-            articlesRecord.map { it.fields }.takeIf { it.isNotEmpty() }
-                    ?.filter { !(it.nsfw == "true") || nsfw }?.run {
+            articlesRecord.map { it.fields }.takeIf { it.isNotEmpty() }?.run {
                 when (val group = getFlagOption(FLAG_GROUP) ?: GROUP_NONE) {
                     GROUP_NONE -> forEach {
                         section(classes = "group") {
@@ -148,6 +154,12 @@ Options:
                             br { }
                             br { }
                         }
+                }
+            }
+            if (config?.friendUnlocked != true) {
+                p {
+                    hr { }
+                    em { +"Private access not enabled, use friend code for full content" }
                 }
             }
         }

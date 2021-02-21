@@ -184,7 +184,7 @@ Options:
             if (config?.friendUnlocked != true) {
                 p {
                     hr { }
-                    em { +"Public only enabled, use friend code for full content" }
+                    em { +"Private access not enabled, use friend code for full content" }
                 }
             }
         }

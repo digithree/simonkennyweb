@@ -13,7 +13,7 @@ interface IOrder<T> {
     val direction: String
 }
 
-data class FieldMatcher(val field: String, val value: String)
+data class FieldMatcher(val field: String, val value: String, val reverseLogic: Boolean = false)
 
 class RequestWrapper<T>(
     private val token: String,
@@ -34,13 +34,11 @@ class RequestWrapper<T>(
             list = request(client) {
                 url("https://api.airtable.com/v0/appeP7oDW7r7B82Zn/$table")
                 fieldMatchers?.takeIf { it.isNotEmpty() }?.run {
-                    if (size == 1) parameter("filterByFormula", "{${this[0].field}} = '${this[0].value}'")
-                    else {
-                        parameter("filterByFormula",
-                            joinToString(",", transform = { fieldMatcher ->
-                                "{${fieldMatcher.field}} = '${fieldMatcher.value}'"
-                            }).let { "AND($it)" })
-                    }
+                    parameter("filterByFormula",
+                        joinToString(",", transform = { fieldMatcher ->
+                            if (fieldMatcher.reverseLogic) "NOT({${fieldMatcher.field}} = '${fieldMatcher.value}')"
+                            else "{${fieldMatcher.field}} = '${fieldMatcher.value}'"
+                        }).let { "AND($it)" })
                 }
                 limit?.takeIf { (1..100).contains(it) }?.run {parameter("maxRecords", "$this") }
                 order?.run {

@@ -43,6 +43,6 @@ data class ArticlesFields(
     val description: String?,
     val published: String?,
     val added: String,
-    val nsfw: String?, // Boolean as String
+    val public: String?, // Boolean as String
     val comment: String?
 )
