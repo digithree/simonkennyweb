@@ -1,6 +1,5 @@
 package co.simonkenny.web
 
-import co.simonkenny.web.command.SuggestedCommand
 import kotlinx.html.*
 
 const val BODY_CLASS = "terminal"
@@ -67,7 +66,7 @@ fun renderPrompt(
     block: HtmlBlockTag,
     hintText: String = "type command",
     filledInText: String? = null,
-    suggestedCommands: List<SuggestedCommand>? = null
+    suggestedCommands: List<String>? = null
 ) =
     with(block) {
         div(DIV_CLASS) {
@@ -91,8 +90,8 @@ fun renderPrompt(
         }
         div("container ahoveroff") {
             suggestedCommands?.forEach {
-                a(href = it.uri) {
-                    button(classes = "btn btn-primary btn-ghost") { +it.text }
+                a(href = "/?cmd=${it.replace(' ', '+')}") {
+                    button(classes = "btn btn-primary btn-ghost") { +it }
                 }
                 +" "
             }

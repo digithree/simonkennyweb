@@ -12,10 +12,11 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.html.*
 
 private val SUGGESTED_COMMANDS = listOf(
-    SuggestedCommand("/?cmd=help", "help"),
-    SuggestedCommand("/?cmd=about+work", "about work"),
-    SuggestedCommand("/?cmd=articles+-g=monthpub", "articles -g=monthpub"),
-    SuggestedCommand("/?cmd=config+-d", "config --dark")
+    "help",
+    "about work",
+    "config --dark",
+    "articles --group=monthpub",
+    "media all --rating=5"
 )
 
 
@@ -90,9 +91,12 @@ fun Application.module(testing: Boolean = false) {
                     br { }
                     // page header, always the same
                     div(DIV_CLASS) {
-                        h1 {
+                        p {
                             img(src = "/favicon-32x32.png", classes = "tinytiny")
-                            +" Simon Kenny - personal website"
+                            +" Simon Kenny - personal website "
+                            if (commands.isNotEmpty()) {
+                                a(href = "/") { +"[home]" }
+                            }
                         }
                         if (commands.isEmpty()) {
                             with(AboutCommand.default()) {
@@ -100,7 +104,7 @@ fun Application.module(testing: Boolean = false) {
                                     +"Default command: "
                                     code { +toUriCmdParam() }
                                 }
-                                p { +"Enter command in text box to explore website content 😁" }
+                                p { em { +"Enter command in text box to explore website content 😁" } }
                             }
                         }
                     }

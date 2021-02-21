@@ -14,8 +14,6 @@ import java.util.*
 
 private val DATE_FORMAT_READABLE = SimpleDateFormat("dd MMMMMMM yyyy")
 
-data class SuggestedCommand(val uri: String, val text: String)
-
 data class CommandMetadata(val name: String, val params: List<String>)
 
 abstract class Command(
