@@ -1,0 +1,5 @@
+{
+  "name": "simonkennyweb",
+  "description": "Personal website, written in Kotlin with Ktor. Displays in quirky Terminal CSS with faux command line navigation.",
+  "image": "heroku/java"
+}

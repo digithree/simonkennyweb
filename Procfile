@@ -1,0 +1,1 @@
+web:    java -jar dist/simonkennyweb-shadow.jar -P:ktor.security.airtableApiKey="$AIRTABLE_API_KEY" -P:ktor.security.friendCode="$FRIEND_CODE"

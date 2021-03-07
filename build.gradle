@@ -32,6 +32,18 @@ repositories {
     maven { url "https://dl.bintray.com/jetbrains/markdown" }
 }
 
+shadowJar {
+    // configure to output to /dist/simonkennyweb-shadow.jar
+    destinationDirectory.set(file("dist"))
+    archiveBaseName.set('simonkennyweb-shadow')
+    archiveClassifier.set('')
+    archiveVersion.set('')
+}
+
+task stage() {
+    // empty task needed for Heroku deployment, ignored
+}
+
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
